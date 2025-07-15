@@ -313,6 +313,41 @@
 
                     <div id="magazineConfigs">
                         <!-- Magazine configurations will be dynamically inserted here -->
+                        <div class="magazine-config">
+                            <h3>Magazine 1</h3>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="mag1Pockets">Number of Pockets:</label>
+                                    <input type="number" id="mag1Pockets" name="mag1Pockets" value="8" min="1" max="20">
+                                </div>
+                                <div class="form-col">
+                                    <label for="mag1Alignment">Alignment:</label>
+                                    <select id="mag1Alignment" name="mag1Alignment">
+                                        <option value="0" selected>X Axis</option>
+                                        <option value="1">Y Axis</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="mag1Direction">Direction (Pocket 1 to 2):</label>
+                                    <select id="mag1Direction" name="mag1Direction">
+                                        <option value="1" selected>Positive</option>
+                                        <option value="-1">Negative</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <label for="mag1PocketOneX">Pocket 1 X Position:</label>
+                                    <input type="number" id="mag1PocketOneX" name="mag1PocketOneX" value="212.1" step="0.1">
+                                </div>
+                                <div class="form-col">
+                                    <label for="mag1PocketOneY">Pocket 1 Y Position:</label>
+                                    <input type="number" id="mag1PocketOneY" name="mag1PocketOneY" value="72.6" step="0.1">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -570,6 +605,7 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
             initializeCollapsibles();
             initializeMagazineSelector();
             initializeEventListeners();
@@ -602,8 +638,10 @@
 
         // Update magazine configurations based on selected count
         function updateMagazineConfigs() {
+            console.log('Updating magazine configs...');
             const count = parseInt(document.getElementById('magazineCount').value);
             const container = document.getElementById('magazineConfigs');
+            console.log('Magazine count:', count, 'Container:', container);
             container.innerHTML = '';
 
             for (let i = 1; i <= count; i++) {
@@ -646,6 +684,7 @@
                 `;
                 container.appendChild(magazineDiv);
             }
+            console.log('Magazine configs updated, container now has', container.children.length, 'children');
         }
 
         // Get default X position for pocket 1 based on magazine number
@@ -688,12 +727,16 @@
 
         // Generate configuration files
         function generateConfiguration() {
+            console.log('Generate configuration called');
             try {
                 const formData = collectFormData();
+                console.log('Form data collected:', formData);
                 validateFormData(formData);
+                console.log('Form data validated');
                 
                 generatedFiles.init = generateInitFile(formData);
                 generatedFiles.tc = generateTcFile(formData);
+                console.log('Files generated');
                 
                 showPreview();
                 showDownloadSection();
@@ -702,12 +745,14 @@
                 showMessage('Configuration generated successfully!', 'success');
                 
             } catch (error) {
+                console.error('Error generating configuration:', error);
                 showMessage('Error generating configuration: ' + error.message, 'error');
             }
         }
 
         // Collect form data
         function collectFormData() {
+            console.log('Collecting form data...');
             const data = {
                 magazineCount: parseInt(document.getElementById('magazineCount').value),
                 units: document.getElementById('units').value,
@@ -746,16 +791,36 @@
             };
 
             // Collect magazine data
+            console.log('Collecting magazine data for', data.magazineCount, 'magazines');
             for (let i = 1; i <= data.magazineCount; i++) {
+                const pocketsElement = document.getElementById(`mag${i}Pockets`);
+                const alignmentElement = document.getElementById(`mag${i}Alignment`);
+                const directionElement = document.getElementById(`mag${i}Direction`);
+                const pocketOneXElement = document.getElementById(`mag${i}PocketOneX`);
+                const pocketOneYElement = document.getElementById(`mag${i}PocketOneY`);
+                
+                console.log(`Magazine ${i} elements:`, {
+                    pocketsElement,
+                    alignmentElement,
+                    directionElement,
+                    pocketOneXElement,
+                    pocketOneYElement
+                });
+                
+                if (!pocketsElement || !alignmentElement || !directionElement || !pocketOneXElement || !pocketOneYElement) {
+                    throw new Error(`Magazine ${i} configuration fields are missing. Please refresh the page and try again.`);
+                }
+                
                 data.magazines.push({
-                    pockets: parseInt(document.getElementById(`mag${i}Pockets`).value),
-                    alignment: parseInt(document.getElementById(`mag${i}Alignment`).value),
-                    direction: parseInt(document.getElementById(`mag${i}Direction`).value),
-                    pocketOneX: parseFloat(document.getElementById(`mag${i}PocketOneX`).value),
-                    pocketOneY: parseFloat(document.getElementById(`mag${i}PocketOneY`).value)
+                    pockets: parseInt(pocketsElement.value),
+                    alignment: parseInt(alignmentElement.value),
+                    direction: parseInt(directionElement.value),
+                    pocketOneX: parseFloat(pocketOneXElement.value),
+                    pocketOneY: parseFloat(pocketOneYElement.value)
                 });
             }
 
+            console.log('Form data collected successfully:', data);
             return data;
         }
 
