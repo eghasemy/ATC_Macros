@@ -606,9 +606,14 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing...');
-            initializeCollapsibles();
-            initializeMagazineSelector();
-            initializeEventListeners();
+            try {
+                initializeCollapsibles();
+                initializeMagazineSelector();
+                initializeEventListeners();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                alert('Error: ' + error.message);
+            }
         });
 
         // Initialize collapsible sections
@@ -631,9 +636,17 @@
 
         // Initialize magazine selector
         function initializeMagazineSelector() {
+            console.log('Initializing magazine selector...');
             const magazineCountSelect = document.getElementById('magazineCount');
-            magazineCountSelect.addEventListener('change', updateMagazineConfigs);
-            updateMagazineConfigs(); // Initialize with default value
+            if (magazineCountSelect) {
+                magazineCountSelect.addEventListener('change', function() {
+                    console.log('Magazine count changed to:', this.value);
+                    updateMagazineConfigs();
+                });
+                updateMagazineConfigs(); // Initialize with default value
+            } else {
+                console.error('Magazine count select element not found');
+            }
         }
 
         // Update magazine configurations based on selected count
@@ -642,46 +655,129 @@
             const count = parseInt(document.getElementById('magazineCount').value);
             const container = document.getElementById('magazineConfigs');
             console.log('Magazine count:', count, 'Container:', container);
+            
+            if (!container) {
+                console.error('Magazine configs container not found');
+                return;
+            }
+            
+            // Clear existing content
             container.innerHTML = '';
 
             for (let i = 1; i <= count; i++) {
+                console.log('Creating magazine', i);
                 const magazineDiv = document.createElement('div');
                 magazineDiv.className = 'magazine-config';
-                magazineDiv.innerHTML = `
-                    <h3>Magazine ${i}</h3>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="mag${i}Pockets">Number of Pockets:</label>
-                            <input type="number" id="mag${i}Pockets" name="mag${i}Pockets" value="${i === 1 ? '8' : '4'}" min="1" max="20">
-                        </div>
-                        <div class="form-col">
-                            <label for="mag${i}Alignment">Alignment:</label>
-                            <select id="mag${i}Alignment" name="mag${i}Alignment">
-                                <option value="0" selected>X Axis</option>
-                                <option value="1">Y Axis</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="mag${i}Direction">Direction (Pocket 1 to 2):</label>
-                            <select id="mag${i}Direction" name="mag${i}Direction">
-                                <option value="1" selected>Positive</option>
-                                <option value="-1">Negative</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="mag${i}PocketOneX">Pocket 1 X Position:</label>
-                            <input type="number" id="mag${i}PocketOneX" name="mag${i}PocketOneX" value="${getPocketOneX(i)}" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="mag${i}PocketOneY">Pocket 1 Y Position:</label>
-                            <input type="number" id="mag${i}PocketOneY" name="mag${i}PocketOneY" value="${getPocketOneY(i)}" step="0.1">
-                        </div>
-                    </div>
-                `;
+                
+                // Create elements step by step instead of using template literal
+                const h3 = document.createElement('h3');
+                h3.textContent = 'Magazine ' + i;
+                magazineDiv.appendChild(h3);
+                
+                // First row: Pockets and Alignment
+                const row1 = document.createElement('div');
+                row1.className = 'form-row';
+                
+                const col1 = document.createElement('div');
+                col1.className = 'form-col';
+                const label1 = document.createElement('label');
+                label1.setAttribute('for', 'mag' + i + 'Pockets');
+                label1.textContent = 'Number of Pockets:';
+                const input1 = document.createElement('input');
+                input1.type = 'number';
+                input1.id = 'mag' + i + 'Pockets';
+                input1.name = 'mag' + i + 'Pockets';
+                input1.value = i === 1 ? '8' : '4';
+                input1.min = '1';
+                input1.max = '20';
+                col1.appendChild(label1);
+                col1.appendChild(input1);
+                
+                const col2 = document.createElement('div');
+                col2.className = 'form-col';
+                const label2 = document.createElement('label');
+                label2.setAttribute('for', 'mag' + i + 'Alignment');
+                label2.textContent = 'Alignment:';
+                const select1 = document.createElement('select');
+                select1.id = 'mag' + i + 'Alignment';
+                select1.name = 'mag' + i + 'Alignment';
+                const option1a = document.createElement('option');
+                option1a.value = '0';
+                option1a.selected = true;
+                option1a.textContent = 'X Axis';
+                const option1b = document.createElement('option');
+                option1b.value = '1';
+                option1b.textContent = 'Y Axis';
+                select1.appendChild(option1a);
+                select1.appendChild(option1b);
+                col2.appendChild(label2);
+                col2.appendChild(select1);
+                
+                row1.appendChild(col1);
+                row1.appendChild(col2);
+                magazineDiv.appendChild(row1);
+                
+                // Second row: Direction
+                const row2 = document.createElement('div');
+                row2.className = 'form-row';
+                const col3 = document.createElement('div');
+                col3.className = 'form-col';
+                const label3 = document.createElement('label');
+                label3.setAttribute('for', 'mag' + i + 'Direction');
+                label3.textContent = 'Direction (Pocket 1 to 2):';
+                const select2 = document.createElement('select');
+                select2.id = 'mag' + i + 'Direction';
+                select2.name = 'mag' + i + 'Direction';
+                const option2a = document.createElement('option');
+                option2a.value = '1';
+                option2a.selected = true;
+                option2a.textContent = 'Positive';
+                const option2b = document.createElement('option');
+                option2b.value = '-1';
+                option2b.textContent = 'Negative';
+                select2.appendChild(option2a);
+                select2.appendChild(option2b);
+                col3.appendChild(label3);
+                col3.appendChild(select2);
+                row2.appendChild(col3);
+                magazineDiv.appendChild(row2);
+                
+                // Third row: Pocket positions
+                const row3 = document.createElement('div');
+                row3.className = 'form-row';
+                
+                const col4 = document.createElement('div');
+                col4.className = 'form-col';
+                const label4 = document.createElement('label');
+                label4.setAttribute('for', 'mag' + i + 'PocketOneX');
+                label4.textContent = 'Pocket 1 X Position:';
+                const input2 = document.createElement('input');
+                input2.type = 'number';
+                input2.id = 'mag' + i + 'PocketOneX';
+                input2.name = 'mag' + i + 'PocketOneX';
+                input2.value = getPocketOneX(i);
+                input2.step = '0.1';
+                col4.appendChild(label4);
+                col4.appendChild(input2);
+                
+                const col5 = document.createElement('div');
+                col5.className = 'form-col';
+                const label5 = document.createElement('label');
+                label5.setAttribute('for', 'mag' + i + 'PocketOneY');
+                label5.textContent = 'Pocket 1 Y Position:';
+                const input3 = document.createElement('input');
+                input3.type = 'number';
+                input3.id = 'mag' + i + 'PocketOneY';
+                input3.name = 'mag' + i + 'PocketOneY';
+                input3.value = getPocketOneY(i);
+                input3.step = '0.1';
+                col5.appendChild(label5);
+                col5.appendChild(input3);
+                
+                row3.appendChild(col4);
+                row3.appendChild(col5);
+                magazineDiv.appendChild(row3);
+                
                 container.appendChild(magazineDiv);
             }
             console.log('Magazine configs updated, container now has', container.children.length, 'children');
@@ -719,10 +815,40 @@
 
         // Initialize event listeners
         function initializeEventListeners() {
-            document.getElementById('generateBtn').addEventListener('click', generateConfiguration);
-            document.getElementById('resetBtn').addEventListener('click', resetForm);
-            document.getElementById('downloadInitBtn').addEventListener('click', () => downloadFile('init'));
-            document.getElementById('downloadTcBtn').addEventListener('click', () => downloadFile('tc'));
+            console.log('Initializing event listeners...');
+            
+            const generateBtn = document.getElementById('generateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const downloadInitBtn = document.getElementById('downloadInitBtn');
+            const downloadTcBtn = document.getElementById('downloadTcBtn');
+            
+            if (generateBtn) {
+                generateBtn.addEventListener('click', generateConfiguration);
+                console.log('Generate button event listener added');
+            } else {
+                console.error('Generate button not found');
+            }
+            
+            if (resetBtn) {
+                resetBtn.addEventListener('click', resetForm);
+                console.log('Reset button event listener added');
+            } else {
+                console.error('Reset button not found');
+            }
+            
+            if (downloadInitBtn) {
+                downloadInitBtn.addEventListener('click', () => downloadFile('init'));
+                console.log('Download init button event listener added');
+            } else {
+                console.error('Download init button not found');
+            }
+            
+            if (downloadTcBtn) {
+                downloadTcBtn.addEventListener('click', () => downloadFile('tc'));
+                console.log('Download tc button event listener added');
+            } else {
+                console.error('Download tc button not found');
+            }
         }
 
         // Generate configuration files
