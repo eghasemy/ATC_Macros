@@ -313,41 +313,6 @@
 
                     <div id="magazineConfigs">
                         <!-- Magazine configurations will be dynamically inserted here -->
-                        <div class="magazine-config">
-                            <h3>Magazine 1</h3>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <label for="mag1Pockets">Number of Pockets:</label>
-                                    <input type="number" id="mag1Pockets" name="mag1Pockets" value="8" min="1" max="20">
-                                </div>
-                                <div class="form-col">
-                                    <label for="mag1Alignment">Alignment:</label>
-                                    <select id="mag1Alignment" name="mag1Alignment">
-                                        <option value="0" selected>X Axis</option>
-                                        <option value="1">Y Axis</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <label for="mag1Direction">Direction (Pocket 1 to 2):</label>
-                                    <select id="mag1Direction" name="mag1Direction">
-                                        <option value="1" selected>Positive</option>
-                                        <option value="-1">Negative</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-col">
-                                    <label for="mag1PocketOneX">Pocket 1 X Position:</label>
-                                    <input type="number" id="mag1PocketOneX" name="mag1PocketOneX" value="212.1" step="0.1">
-                                </div>
-                                <div class="form-col">
-                                    <label for="mag1PocketOneY">Pocket 1 Y Position:</label>
-                                    <input type="number" id="mag1PocketOneY" name="mag1PocketOneY" value="72.6" step="0.1">
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -597,6 +562,8 @@
     </div>
 
     <script>
+        console.log('Script loaded');
+        
         // Global variables to store generated files
         let generatedFiles = {
             init: '',
@@ -606,177 +573,104 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, initializing...');
-            try {
-                initializeCollapsibles();
-                initializeMagazineSelector();
-                initializeEventListeners();
-            } catch (error) {
-                console.error('Error during initialization:', error);
-                alert('Error: ' + error.message);
-            }
+            
+            // Initialize magazine selector immediately
+            updateMagazineConfigs();
+            
+            // Initialize collapsibles
+            initializeCollapsibles();
+            
+            // Initialize event listeners
+            initializeEventListeners();
+            
+            console.log('All initializations completed successfully');
         });
 
         // Initialize collapsible sections
         function initializeCollapsibles() {
+            console.log('Initializing collapsibles...');
             const collapsibles = document.getElementsByClassName('collapsible');
+            console.log('Found', collapsibles.length, 'collapsible elements');
             
             for (let i = 0; i < collapsibles.length; i++) {
                 collapsibles[i].addEventListener('click', function() {
+                    console.log('Collapsible clicked:', this.textContent);
                     this.classList.toggle('active');
                     const content = this.nextElementSibling;
                     
-                    if (content.classList.contains('active')) {
-                        content.classList.remove('active');
+                    if (content && content.classList.contains('content')) {
+                        if (content.classList.contains('active')) {
+                            content.classList.remove('active');
+                            console.log('Content collapsed');
+                        } else {
+                            content.classList.add('active');
+                            console.log('Content expanded');
+                        }
                     } else {
-                        content.classList.add('active');
+                        console.error('Content element not found or invalid');
                     }
                 });
             }
-        }
-
-        // Initialize magazine selector
-        function initializeMagazineSelector() {
-            console.log('Initializing magazine selector...');
-            const magazineCountSelect = document.getElementById('magazineCount');
-            if (magazineCountSelect) {
-                magazineCountSelect.addEventListener('change', function() {
-                    console.log('Magazine count changed to:', this.value);
-                    updateMagazineConfigs();
-                });
-                updateMagazineConfigs(); // Initialize with default value
-            } else {
-                console.error('Magazine count select element not found');
-            }
+            console.log('Collapsible initialization completed');
         }
 
         // Update magazine configurations based on selected count
         function updateMagazineConfigs() {
             console.log('Updating magazine configs...');
-            const count = parseInt(document.getElementById('magazineCount').value);
+            const magazineCountSelect = document.getElementById('magazineCount');
             const container = document.getElementById('magazineConfigs');
-            console.log('Magazine count:', count, 'Container:', container);
             
-            if (!container) {
-                console.error('Magazine configs container not found');
+            if (!magazineCountSelect || !container) {
+                console.error('Magazine elements not found');
                 return;
             }
+            
+            const count = parseInt(magazineCountSelect.value);
+            console.log('Magazine count:', count);
             
             // Clear existing content
             container.innerHTML = '';
 
             for (let i = 1; i <= count; i++) {
                 console.log('Creating magazine', i);
+                
                 const magazineDiv = document.createElement('div');
                 magazineDiv.className = 'magazine-config';
-                
-                // Create elements step by step instead of using template literal
-                const h3 = document.createElement('h3');
-                h3.textContent = 'Magazine ' + i;
-                magazineDiv.appendChild(h3);
-                
-                // First row: Pockets and Alignment
-                const row1 = document.createElement('div');
-                row1.className = 'form-row';
-                
-                const col1 = document.createElement('div');
-                col1.className = 'form-col';
-                const label1 = document.createElement('label');
-                label1.setAttribute('for', 'mag' + i + 'Pockets');
-                label1.textContent = 'Number of Pockets:';
-                const input1 = document.createElement('input');
-                input1.type = 'number';
-                input1.id = 'mag' + i + 'Pockets';
-                input1.name = 'mag' + i + 'Pockets';
-                input1.value = i === 1 ? '8' : '4';
-                input1.min = '1';
-                input1.max = '20';
-                col1.appendChild(label1);
-                col1.appendChild(input1);
-                
-                const col2 = document.createElement('div');
-                col2.className = 'form-col';
-                const label2 = document.createElement('label');
-                label2.setAttribute('for', 'mag' + i + 'Alignment');
-                label2.textContent = 'Alignment:';
-                const select1 = document.createElement('select');
-                select1.id = 'mag' + i + 'Alignment';
-                select1.name = 'mag' + i + 'Alignment';
-                const option1a = document.createElement('option');
-                option1a.value = '0';
-                option1a.selected = true;
-                option1a.textContent = 'X Axis';
-                const option1b = document.createElement('option');
-                option1b.value = '1';
-                option1b.textContent = 'Y Axis';
-                select1.appendChild(option1a);
-                select1.appendChild(option1b);
-                col2.appendChild(label2);
-                col2.appendChild(select1);
-                
-                row1.appendChild(col1);
-                row1.appendChild(col2);
-                magazineDiv.appendChild(row1);
-                
-                // Second row: Direction
-                const row2 = document.createElement('div');
-                row2.className = 'form-row';
-                const col3 = document.createElement('div');
-                col3.className = 'form-col';
-                const label3 = document.createElement('label');
-                label3.setAttribute('for', 'mag' + i + 'Direction');
-                label3.textContent = 'Direction (Pocket 1 to 2):';
-                const select2 = document.createElement('select');
-                select2.id = 'mag' + i + 'Direction';
-                select2.name = 'mag' + i + 'Direction';
-                const option2a = document.createElement('option');
-                option2a.value = '1';
-                option2a.selected = true;
-                option2a.textContent = 'Positive';
-                const option2b = document.createElement('option');
-                option2b.value = '-1';
-                option2b.textContent = 'Negative';
-                select2.appendChild(option2a);
-                select2.appendChild(option2b);
-                col3.appendChild(label3);
-                col3.appendChild(select2);
-                row2.appendChild(col3);
-                magazineDiv.appendChild(row2);
-                
-                // Third row: Pocket positions
-                const row3 = document.createElement('div');
-                row3.className = 'form-row';
-                
-                const col4 = document.createElement('div');
-                col4.className = 'form-col';
-                const label4 = document.createElement('label');
-                label4.setAttribute('for', 'mag' + i + 'PocketOneX');
-                label4.textContent = 'Pocket 1 X Position:';
-                const input2 = document.createElement('input');
-                input2.type = 'number';
-                input2.id = 'mag' + i + 'PocketOneX';
-                input2.name = 'mag' + i + 'PocketOneX';
-                input2.value = getPocketOneX(i);
-                input2.step = '0.1';
-                col4.appendChild(label4);
-                col4.appendChild(input2);
-                
-                const col5 = document.createElement('div');
-                col5.className = 'form-col';
-                const label5 = document.createElement('label');
-                label5.setAttribute('for', 'mag' + i + 'PocketOneY');
-                label5.textContent = 'Pocket 1 Y Position:';
-                const input3 = document.createElement('input');
-                input3.type = 'number';
-                input3.id = 'mag' + i + 'PocketOneY';
-                input3.name = 'mag' + i + 'PocketOneY';
-                input3.value = getPocketOneY(i);
-                input3.step = '0.1';
-                col5.appendChild(label5);
-                col5.appendChild(input3);
-                
-                row3.appendChild(col4);
-                row3.appendChild(col5);
-                magazineDiv.appendChild(row3);
+                magazineDiv.innerHTML = `
+                    <h3>Magazine ${i}</h3>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="mag${i}Pockets">Number of Pockets:</label>
+                            <input type="number" id="mag${i}Pockets" name="mag${i}Pockets" value="${i === 1 ? 8 : 4}" min="1" max="20">
+                        </div>
+                        <div class="form-col">
+                            <label for="mag${i}Alignment">Alignment:</label>
+                            <select id="mag${i}Alignment" name="mag${i}Alignment">
+                                <option value="0" selected>X Axis</option>
+                                <option value="1">Y Axis</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="mag${i}Direction">Direction (Pocket 1 to 2):</label>
+                            <select id="mag${i}Direction" name="mag${i}Direction">
+                                <option value="1" selected>Positive</option>
+                                <option value="-1">Negative</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="mag${i}PocketOneX">Pocket 1 X Position:</label>
+                            <input type="number" id="mag${i}PocketOneX" name="mag${i}PocketOneX" value="${getPocketOneX(i)}" step="0.1">
+                        </div>
+                        <div class="form-col">
+                            <label for="mag${i}PocketOneY">Pocket 1 Y Position:</label>
+                            <input type="number" id="mag${i}PocketOneY" name="mag${i}PocketOneY" value="${getPocketOneY(i)}" step="0.1">
+                        </div>
+                    </div>
+                `;
                 
                 container.appendChild(magazineDiv);
             }
@@ -817,931 +711,40 @@
         function initializeEventListeners() {
             console.log('Initializing event listeners...');
             
+            // Magazine selector change event
+            const magazineCountSelect = document.getElementById('magazineCount');
+            if (magazineCountSelect) {
+                magazineCountSelect.addEventListener('change', function() {
+                    console.log('Magazine count changed to:', this.value);
+                    updateMagazineConfigs();
+                });
+                console.log('Magazine selector event listener added');
+            }
+            
+            // Generate button
             const generateBtn = document.getElementById('generateBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const downloadInitBtn = document.getElementById('downloadInitBtn');
-            const downloadTcBtn = document.getElementById('downloadTcBtn');
-            
             if (generateBtn) {
-                generateBtn.addEventListener('click', generateConfiguration);
+                generateBtn.addEventListener('click', function() {
+                    console.log('Generate button clicked');
+                    alert('Generate button works! (Full implementation coming...)');
+                });
                 console.log('Generate button event listener added');
-            } else {
-                console.error('Generate button not found');
             }
             
+            // Reset button
+            const resetBtn = document.getElementById('resetBtn');
             if (resetBtn) {
-                resetBtn.addEventListener('click', resetForm);
+                resetBtn.addEventListener('click', function() {
+                    console.log('Reset button clicked');
+                    document.getElementById('atcForm').reset();
+                    updateMagazineConfigs();
+                    alert('Form reset!');
+                });
                 console.log('Reset button event listener added');
-            } else {
-                console.error('Reset button not found');
-            }
-            
-            if (downloadInitBtn) {
-                downloadInitBtn.addEventListener('click', () => downloadFile('init'));
-                console.log('Download init button event listener added');
-            } else {
-                console.error('Download init button not found');
-            }
-            
-            if (downloadTcBtn) {
-                downloadTcBtn.addEventListener('click', () => downloadFile('tc'));
-                console.log('Download tc button event listener added');
-            } else {
-                console.error('Download tc button not found');
             }
         }
 
-        // Generate configuration files
-        function generateConfiguration() {
-            console.log('Generate configuration called');
-            try {
-                const formData = collectFormData();
-                console.log('Form data collected:', formData);
-                validateFormData(formData);
-                console.log('Form data validated');
-                
-                generatedFiles.init = generateInitFile(formData);
-                generatedFiles.tc = generateTcFile(formData);
-                console.log('Files generated');
-                
-                showPreview();
-                showDownloadSection();
-                
-                // Show success message
-                showMessage('Configuration generated successfully!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating configuration:', error);
-                showMessage('Error generating configuration: ' + error.message, 'error');
-            }
-        }
-
-        // Collect form data
-        function collectFormData() {
-            console.log('Collecting form data...');
-            const data = {
-                magazineCount: parseInt(document.getElementById('magazineCount').value),
-                units: document.getElementById('units').value,
-                pocketOffset: parseFloat(document.getElementById('pocketOffset').value),
-                engageZ: parseFloat(document.getElementById('engageZ').value),
-                loadSpinZ: parseFloat(document.getElementById('loadSpinZ').value),
-                toLoadZ: parseFloat(document.getElementById('toLoadZ').value),
-                toMeasureZ: parseFloat(document.getElementById('toMeasureZ').value),
-                safeZ: parseFloat(document.getElementById('safeZ').value),
-                plungeCount: parseInt(document.getElementById('plungeCount').value),
-                engageFeed: parseInt(document.getElementById('engageFeed').value),
-                unloadRpm: parseInt(document.getElementById('unloadRpm').value),
-                loadRpm: parseInt(document.getElementById('loadRpm').value),
-                manualX: parseFloat(document.getElementById('manualX').value),
-                manualY: parseFloat(document.getElementById('manualY').value),
-                coverMode: parseInt(document.getElementById('coverMode').value),
-                coverAxis: parseInt(document.getElementById('coverAxis').value),
-                coverClosedPos: parseFloat(document.getElementById('coverClosedPos').value),
-                coverOpenPos: parseFloat(document.getElementById('coverOpenPos').value),
-                coverOutput: parseInt(document.getElementById('coverOutput').value),
-                coverDwell: parseFloat(document.getElementById('coverDwell').value),
-                recognize: parseInt(document.getElementById('recognize').value),
-                recInput: parseInt(document.getElementById('recInput').value),
-                zoneOneZ: parseFloat(document.getElementById('zoneOneZ').value),
-                zoneTwoZ: parseFloat(document.getElementById('zoneTwoZ').value),
-                measure: parseInt(document.getElementById('measure').value),
-                measureX: parseFloat(document.getElementById('measureX').value),
-                measureY: parseFloat(document.getElementById('measureY').value),
-                measureStartZ: parseFloat(document.getElementById('measureStartZ').value),
-                seekDist: parseFloat(document.getElementById('seekDist').value),
-                retractDist: parseFloat(document.getElementById('retractDist').value),
-                seekFeed: parseInt(document.getElementById('seekFeed').value),
-                setFeed: parseInt(document.getElementById('setFeed').value),
-                tloRef: parseFloat(document.getElementById('tloRef').value),
-                magazines: []
-            };
-
-            // Collect magazine data
-            console.log('Collecting magazine data for', data.magazineCount, 'magazines');
-            for (let i = 1; i <= data.magazineCount; i++) {
-                const pocketsElement = document.getElementById(`mag${i}Pockets`);
-                const alignmentElement = document.getElementById(`mag${i}Alignment`);
-                const directionElement = document.getElementById(`mag${i}Direction`);
-                const pocketOneXElement = document.getElementById(`mag${i}PocketOneX`);
-                const pocketOneYElement = document.getElementById(`mag${i}PocketOneY`);
-                
-                console.log(`Magazine ${i} elements:`, {
-                    pocketsElement,
-                    alignmentElement,
-                    directionElement,
-                    pocketOneXElement,
-                    pocketOneYElement
-                });
-                
-                if (!pocketsElement || !alignmentElement || !directionElement || !pocketOneXElement || !pocketOneYElement) {
-                    throw new Error(`Magazine ${i} configuration fields are missing. Please refresh the page and try again.`);
-                }
-                
-                data.magazines.push({
-                    pockets: parseInt(pocketsElement.value),
-                    alignment: parseInt(alignmentElement.value),
-                    direction: parseInt(directionElement.value),
-                    pocketOneX: parseFloat(pocketOneXElement.value),
-                    pocketOneY: parseFloat(pocketOneYElement.value)
-                });
-            }
-
-            console.log('Form data collected successfully:', data);
-            return data;
-        }
-
-        // Validate form data
-        function validateFormData(data) {
-            if (data.magazineCount < 1 || data.magazineCount > 8) {
-                throw new Error('Magazine count must be between 1 and 8');
-            }
-            
-            if (data.pocketOffset <= 0) {
-                throw new Error('Pocket offset must be positive');
-            }
-            
-            for (let i = 0; i < data.magazines.length; i++) {
-                if (data.magazines[i].pockets < 1 || data.magazines[i].pockets > 20) {
-                    throw new Error(`Magazine ${i + 1} pocket count must be between 1 and 20`);
-                }
-            }
-        }
-
-        // Generate init.nc file
-        function generateInitFile(data) {
-            let content = '';
-            
-            // Add header comment
-            content += '; ******** BEGIN USER CONFIGURATION ********\n';
-            content += '; ATC Operations\n';
-            content += '; The units for your configuration: 20 = Inches, 21 = Millimeters\n';
-            content += `#<_rc_units> = ${data.units}\n`;
-            content += `(print,Units: #<_rc_units>)\n\n`;
-
-            if (data.magazineCount === 1) {
-                // Single magazine format
-                content += '; The number of pockets in your magazine.\n';
-                content += `#<_rc_pockets> = ${data.magazines[0].pockets}\n`;
-                content += `(print,Pockets: #<_rc_pockets>)\n\n`;
-
-                content += '; The pocket offset for your magazine.\n';
-                content += `#<_rc_pocket_offset> = ${data.pocketOffset}\n`;
-                content += `(print,Pocket Offset: #<_rc_pocket_offset>)\n\n`;
-
-                content += '; The axis along which the magazine is aligned: 0 = X Axis, 1 = Y Axis.\n';
-                content += `#<_rc_alignment> = ${data.magazines[0].alignment}\n`;
-                content += `(print,Alignment: #<_rc_alignment>)\n\n`;
-
-                content += '; The direction of travel from pocket 1 to pocket 2: 1 = Positive, -1 = Negative.\n';
-                content += `#<_rc_direction> = ${data.magazines[0].direction}\n`;
-                content += `(print,Direction: #<_rc_direction>)\n\n`;
-
-                content += '; The X an Y machine coordinate positions of pocket 1.\n';
-                content += `#<_rc_pocket_one_x> = ${data.magazines[0].pocketOneX}\n`;
-                content += `(print,Pocket 1 X: #<_rc_pocket_one_x>)\n\n`;
-                content += `#<_rc_pocket_one_y> = ${data.magazines[0].pocketOneY}\n`;
-                content += `(print,Pocket 1 Y: #<_rc_pocket_one_y>)\n\n`;
-            } else {
-                // Multi-magazine format
-                for (let i = 1; i <= data.magazineCount; i++) {
-                    const mag = data.magazines[i - 1];
-                    content += `; The number of pockets in your ${getOrdinal(i)} magazine.\n`;
-                    content += `#<_rc${i}_pockets> = ${mag.pockets}\n`;
-                    content += `(print,Pockets: #<_rc${i}_pockets>)\n\n`;
-                }
-
-                content += '; The pocket offset for your magazines.\n';
-                content += `#<_rc_pocket_offset> = ${data.pocketOffset}\n`;
-                content += `(print,Pocket Offset: #<_rc_pocket_offset>)\n\n`;
-
-                for (let i = 1; i <= data.magazineCount; i++) {
-                    const mag = data.magazines[i - 1];
-                    content += `; The axis along which the ${getOrdinal(i)} magazine is aligned: 0 = X Axis, 1 = Y Axis.\n`;
-                    content += `#<_rc${i}_alignment> = ${mag.alignment}\n`;
-                    content += `(print,Alignment: #<_rc${i}_alignment>)\n\n`;
-                }
-
-                for (let i = 1; i <= data.magazineCount; i++) {
-                    const mag = data.magazines[i - 1];
-                    content += `; The direction of travel from pocket 1 to pocket 2 for the ${getOrdinal(i)} magazine: 1 = Positive, -1 = Negative.\n`;
-                    content += `#<_rc${i}_direction> = ${mag.direction}\n`;
-                    content += `(print,Direction: #<_rc${i}_direction>)\n\n`;
-                }
-
-                for (let i = 1; i <= data.magazineCount; i++) {
-                    const mag = data.magazines[i - 1];
-                    content += `; The X an Y machine coordinate positions of pocket 1 of the ${getOrdinal(i)} magazine.\n`;
-                    content += `#<_rc${i}_pckt_one_x> = ${mag.pocketOneX}\n`;
-                    content += `(print,Pocket 1 X: #<_rc${i}_pckt_one_x>)\n\n`;
-                    content += `#<_rc${i}_pckt_one_y> = ${mag.pocketOneY}\n`;
-                    content += `(print,Pocket 1 Y: #<_rc${i}_pckt_one_y>)\n\n`;
-                }
-            }
-
-            // Add common settings
-            content += '; The Z machine coordinate positon of engagement.\n';
-            content += `#<_rc_engage_z> = ${data.engageZ}\n`;
-            content += `(print,Engage Z: #<_rc_engage_z>)\n\n`;
-
-            content += '; The Z machine coordinate position at which to start the spindle when loading.\n';
-            content += `#<_rc_load_spin_z> = ${data.loadSpinZ}\n`;
-            content += `(print,Load Spindle Start Z: #<_rc_load_spin_z>)\n\n`;
-
-            content += '; The number of times to plunge when loading.\n';
-            content += `#<_rc_plunge_count> = ${data.plungeCount}\n`;
-            content += `(print,Load Plunge Count: #<_rc_plunge_count>)\n\n`;
-
-            content += '; The Z machine coordinate position to rise to after unloading, before moving to load. (No Tool Loaded RV)\n';
-            content += `#<_rc_to_load_z> = ${data.toLoadZ}\n`;
-            content += `(print,Move To Load Z: #<_rc_to_load_z>)\n\n`;
-
-            content += '; The Z machine coordinate position to rise to after loading, before moving to meeasure.\n';
-            content += `#<_rc_to_measure_z> = ${data.toMeasureZ}\n`;
-            content += `(print,Move To Measure Z: #<_rc_to_measure_z>)\n\n`;
-
-            content += '; The Z machine coordinate position for clearing all obstacles.\n';
-            content += `#<_rc_safe_z> = ${data.safeZ}\n`;
-            content += `(print,Safe Clearance Z: #<_rc_safe_z>)\n\n`;
-
-            content += '; The feed rate for engagement.\n';
-            content += `#<_rc_engage_feed> = ${data.engageFeed}\n`;
-            content += `(print,Engage Feed Rate: #<_rc_engage_feed>)\n\n`;
-
-            content += '; Spindle speed CCW\n';
-            content += `#<_rc_unload_rpm> = ${data.unloadRpm}\n`;
-            content += `(print,Unload RPM: #<_rc_unload_rpm>)\n\n`;
-
-            content += '; Spindle speed CW\n';
-            content += `#<_rc_load_rpm> = ${data.loadRpm}\n`;
-            content += `(print,Load RPM: #<_rc_load_rpm>)\n\n`;
-
-            content += '; Manual Tool Change\n';
-            content += '; X and Y machine coordinates to move to for a manual load/unload.\n';
-            content += `#<_rc_manual_x> = ${data.manualX}\n`;
-            content += `(print,Manual X: #<_rc_manual_x>)\n`;
-            content += `#<_rc_manual_y> = ${data.manualY}\n`;
-            content += `(print,Manual Y: #<_rc_manual_y>)\n\n`;
-
-            // Dust Cover
-            content += '; Dust Cover\n';
-            content += '; The dust cover operational mode: 0 = Disabled, 1 = Axis, 2 = Output\n';
-            content += `#<_rc_cover_mode> = ${data.coverMode}\n`;
-            content += `(print,Dust Cover Mode: #<_rc_cover_mode>)\n\n`;
-
-            content += '; The axis for axis mode: 3 = A Axis, 4 = B Axis, 5 = C Axis\n';
-            content += `#<_rc_cover_axis> = ${data.coverAxis}\n`;
-            content += `(print,Dust Cover Axis: #<_rc_cover_axis>)\n\n`;
-
-            content += '; The machine coordinate closed position for axis mode.\n';
-            content += `#<_rc_cover_c_pos> = ${data.coverClosedPos}\n`;
-            content += `(print,Dust Cover Closed Pos: #<_rc_cover_c_pos>)\n\n`;
-
-            content += '; The machine coordinate open position for axis mode.\n';
-            content += `#<_rc_cover_o_pos> = ${data.coverOpenPos}\n`;
-            content += `(print,Dust Cover Open Pos: #<_rc_cover_o_pos>)\n\n`;
-
-            content += '; The output number for output mode.\n';
-            content += `#<_rc_cover_output> = ${data.coverOutput}\n`;
-            content += `(print,Dust Cover Output: #<_rc_cover_output>)\n\n`;
-
-            content += '; The time to dwell in output mode to allow the cover to fully open/close before moving.\n';
-            content += `#<_rc_cover_dwell> = ${data.coverDwell}\n`;
-            content += `(print,Dust Cover Dwell: #<_rc_cover_dwell>)\n\n`;
-
-            // Tool Recognition
-            content += '; Tool Recognition\n';
-            content += '; Tool recognition mode: 0 = Disabled-User confirmation only, 1 = Enabled\n';
-            content += `#<_rc_recognize> = ${data.recognize}\n`;
-            content += `(print,Tool Recognition Enabled: #<_rc_recognize>)\n\n`;
-
-            content += '; IR sensor input number.\n';
-            content += `#<_rc_rec_input> = ${data.recInput}\n`;
-            content += `(print,Tool Recognition Input: #<_rc_rec_input>)\n\n`;
-
-            content += '; Z Machine coordinate positions tool recognition.\n';
-            content += `#<_rc_zone_one_z> = ${data.zoneOneZ}\n`;
-            content += `(print,Tool Recognition Zone 1 Z: #<_rc_zone_one_z>)\n`;
-            content += `#<_rc_zone_two_z> =${data.zoneTwoZ}\n`;
-            content += `(print,Tool Recognition Zone 2 Z: #<_rc_zone_two_z>)\n\n`;
-
-            // Tool Measurement
-            content += '; Tool Measurement\n';
-            content += '; Tool measurement mode: 0 = Disabled, 1 = Enabled\n';
-            content += `#<_rc_measure> = ${data.measure}\n`;
-            content += `(print,Tool Measure Enabled: #<_rc_measure>)\n\n`;
-
-            content += '; X and Y machine coordinate positions of the tool setter.\n';
-            content += `#<_rc_measure_x> = ${data.measureX}\n`;
-            content += `(print,Tool Measure X: #<_rc_measure_x>)\n`;
-            content += `#<_rc_measure_y> = ${data.measureY}\n`;
-            content += `(print,Tool Measure Y: #<_rc_measure_y>)\n\n`;
-
-            content += '; Z machine coordinate position at which to begin the initial probe.\n';
-            content += `#<_rc_measure_start_z> = ${data.measureStartZ}\n`;
-            content += `(print,Tool Measure Start Z: #<_rc_measure_start_z>)\n\n`;
-
-            content += '; The distance to probe in search of the tool setter for the initial probe.\n';
-            content += `#<_rc_seek_dist> = ${data.seekDist}\n`;
-            content += `(print,Tool Measure Seek Distance: #<_rc_seek_dist>)\n\n`;
-
-            content += '; The distance to retract after the initial probe trigger.\n';
-            content += `#<_rc_retract_dist> = ${data.retractDist}\n\n`;
-            content += `(print,Tool Measure Retract Distance: #<_rc_retract_dist>)\n\n`;
-
-            content += '; The feed rate for the initial probe.\n';
-            content += `#<_rc_seek_feed> = ${data.seekFeed}\n`;
-            content += `(print,Tool Measure Seek Feed Rate: #<_rc_seek_feed>)\n\n`;
-
-            content += '; The feed rate for the second probe.\n';
-            content += `#<_rc_set_feed> = ${data.setFeed}\n`;
-            content += `(print,Tool Measure Set Feed Rate: #<_rc_set_feed>)\n\n`;
-
-            content += '; The optional reference position for TLO. This may remain at it\'s default of 0 or be customized.\n';
-            content += `#<_rc_tlo_ref> = ${data.tloRef}\n`;
-            content += `(print,Tool Measure TLO Ref Pos: #<_rc_tlo_ref>)\n`;
-            content += '; ********* END USER CONFIGURATION *********\n\n';
-
-            // Add calculated settings section
-            content += '; ******** BEGIN CALCULATED SETTINGS *********\n';
-            content += '; ******** DO NOT ALTER THIS SECTION *********\n';
-            content += '; Set static offsets\n';
-            content += '; These calculated offsets are consumed by RapidChange macros.\n';
-            content += 'o100 if [#<_rc_units> EQ 20]\n';
-            content += '  #<_rc_z_spin_off> = 0.91\n';
-            content += '  #<_rc_z_retreat_off> = 0.47\n';
-            content += '  #<_rc_set_distance> = [#<_rc_retract_dist> + 0.04]\n';
-            content += '  (print,Static offsets set for inches)\n';
-            content += 'o100 else\n';
-            content += '  #<_rc_z_spin_off> = 23\n';
-            content += '  #<_rc_z_retreat_off> = 12\n';
-            content += '  #<_rc_set_distance> = [#<_rc_retract_dist> + 1]\n';
-            content += '  (print,Static offsets set for millimeters)\n';
-            content += 'o100 endif\n\n\n';
-
-            content += '; The flag indicating that the settings have been loaded into memory.\n';
-            content += '#1001 = 1\n';
-            content += '(print,Flag Set: #1001)\n';
-            content += '(print,RapidChange ATC Configuration Loaded)\n';
-            content += '; ******** END CALCULATED SETTINGS ***********\n';
-            content += '(print, Current tool #<_current_tool> Selected Tool #<_selected_tool> 5400 #5400)\n';
-            content += '#<_rc_tool1_offset_referenced> = 0\n';
-            content += '#<_rc_tool1_offset> = 0\n';
-            content += 'G43.1 Z0';
-
-            return content;
-        }
-
-        // Generate tc.nc file with complete multi-magazine logic
-        function generateTcFile(data) {
-            let content = '';
-
-            content += '; ************ BEGIN VALIDATION ************\n';
-            content += 'o50 if [#1001 NE 1]\n';
-            content += '\t(print, RapidChange settings are not initialized.)\n';
-            content += '\t(print, Abort operation and initialize RapidChange settings.)\n';
-            content += '\t$Alarm/Send=3\n';
-            content += 'o50 elseif [#<_selected_tool> LT 0]\n';
-            content += '\t(print, Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)\n';
-            content += '\t$Alarm/Send=3\n';
-            content += 'o50 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
-            content += '\t(print, Current tool selected. Tool change bypassed.)\n';
-            content += 'o50 else\n';
-            content += '\t(print, Tool change validated)\n';
-            content += '\t; ************* END VALIDATION *************\n\n';
-
-            // Setup section
-            content += '\t; ************** BEGIN SETUP ***************\n';
-            content += '\t; Turn off spindle and coolant\n';
-            content += '\tM5\n';
-            content += '\tM9\n';
-            content += '\t(print, Spindle and coolant turned off)\n\n';
-
-            content += '\t; Record current units\n';
-            content += '\to200 if [#<_metric> EQ 0]\n';
-            content += '\t\t#<_rc_return_units> = 20\n';
-            content += '\to200 else\n';
-            content += '\t\t#<_rc_return_units> = 21\n';
-            content += '\to200 endif\n';
-            content += '\t(print, Units recorded)\n\n';
-
-            content += '\t; Activate configured units and absolute distance mode\n';
-            content += '\tG[#<_rc_units>] G90\n';
-            content += '\t(print, Set units and distance)\n\n';
-
-            if (data.magazineCount === 1) {
-                // Single magazine pocket calculations
-                content += '\t; Set pocket locations\n';
-                content += '\to210 if [#<_rc_alignment> EQ 0]\n';
-                content += '\t\t#<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
-                content += '\t\t(print, Load X set to #<_rc_x_load>)\n';
-                content += '\t\t#<_rc_y_load> = #<_rc_pocket_one_y>\n';
-                content += '\t\t(print, Load Y set to #<_rc_y_load>)\n\n';
-                content += '\t\t#<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
-                content += '\t\t(print, Unload X set to #<_rc_x_unload>)\n';
-                content += '\t\t#<_rc_y_unload> = #<_rc_pocket_one_y>\n';
-                content += '\t\t(print, Unload Y set to #<_rc_y_unload>)\n';
-                content += '\t\t(print, Pocket locations set for X alignment)\n';
-                content += '\to210 else\n';
-                content += '\t\t#<_rc_x_load> = #<_rc_pocket_one_x>\n';
-                content += '\t\t(print, Load X set to #<_rc_x_load>)\n';
-                content += '\t\t#<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
-                content += '\t\t(print, Load Y set to #<_rc_y_load>)\n\n';
-                content += '\t\t#<_rc_x_unload> = #<_rc_pocket_one_x>\n';
-                content += '\t\t(print, Unload X set to #<_rc_x_unload>)\n';
-                content += '\t\t#<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
-                content += '\t\t(print, Unload Y set to #<_rc_y_unload>)\n';
-                content += '\t\t(print, Pocket locations set for Y alignment)\n';
-                content += '\to210 endif\n\n';
-            } else {
-                // Multi-magazine pocket calculations
-                content += generateMultiMagazineLogic(data);
-            }
-
-            content += '\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t(print, Moved to safe clearance)\n\n';
-
-            // Add dust cover logic
-            content += '\t; Open the dust cover if enabled.\n';
-            content += '\to500 if [#<_rc_cover_mode> EQ 1]\n';
-            content += '\t\t; Axis Mode: move along the configured axis to the open position.\n';
-            content += '\t\to510 if [#<_rc_cover_axis> EQ 3]\n';
-            content += '\t\t\tG53 G0 A[#<_rc_cover_o_pos>]\n';
-            content += '\t\to510 elseif [#<_rc_cover_axis> EQ 4]\n';
-            content += '\t\t\tG53 G0 B[#<_rc_cover_o_pos>]\n';
-            content += '\t\to510 elseif [#<_rc_cover_axis> EQ 5]\n';
-            content += '\t\t\tG53 G0 C[#<_rc_cover_o_pos>]\n';
-            content += '\t  o510 endif\n';
-            content += '\to500 elseif [#<_rc_cover_mode> EQ 2]\n';
-            content += '\t  ; Output Mode: Turn on the output and dwell\n';
-            content += '\t  G4 P0.05\n';
-            content += '\t  M65 P[#<_rc_cover_output>]\n';
-            content += '\t  G4 P[#<_rc_cover_dwell>]\n';
-            content += '\to500 endif\n';
-
-            content += '\t; *************** END SETUP ****************\n\n';
-
-            // Add unload logic
-            content += generateUnloadLogic(data);
-
-            // Add load logic  
-            content += generateLoadLogic(data);
-
-            // Add measurement logic
-            content += generateMeasurementLogic(data);
-
-            // Add teardown logic
-            content += generateTeardownLogic(data);
-
-            content += 'o50 endif\n';
-            content += '; ************* END TOOL CHANGE ***************';
-
-            return content;
-        }
-
-        // Generate multi-magazine logic for determining pocket positions
-        function generateMultiMagazineLogic(data) {
-            let content = '';
-            
-            // Determine current magazine logic
-            content += '\t; Determine selected magazine based on selected tool number\n';
-            for (let i = 1; i <= data.magazineCount; i++) {
-                const cumulative = data.magazines.slice(0, i).reduce((sum, mag) => sum + mag.pockets, 0);
-                const previousCumulative = i === 1 ? 0 : data.magazines.slice(0, i - 1).reduce((sum, mag) => sum + mag.pockets, 0);
-                
-                if (i === 1) {
-                    content += `\to205 if [#<_current_tool> LE #<_rc${i}_pockets>]\n`;
-                } else if (i === data.magazineCount) {
-                    content += `\to205 else\n`;
-                } else {
-                    content += `\to205 elseif [#<_current_tool> GT ${previousCumulative} AND #<_current_tool> LE ${cumulative}]\n`;
-                }
-                
-                content += `\t\t#<_current_magazine> = ${i}\n`;
-                content += `\t\t(print, Current tool in magazine #<_current_magazine>)\n`;
-                
-                // Generate unload position calculation
-                content += `\t\to21${i} if [#<_rc${i}_alignment> EQ 0]\n`;
-                if (i === 1) {
-                    content += `\t\t\t#<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc${i}_direction>] + #<_rc${i}_pckt_one_x>]\n`;
-                } else {
-                    content += `\t\t\t#<_temp1> = [${previousCumulative} + 1]\n`;
-                    content += `\t\t\t#<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
-                    content += `\t\t\t#<_temp3> = [#<_temp2> * #<_rc_pocket_offset>]\n`;
-                    content += `\t\t\t#<_temp4> = [#<_temp3> * #<_rc${i}_direction>]\n`;
-                    content += `\t\t\t#<_rc_x_unload> = [#<_temp4> + #<_rc${i}_pckt_one_x>]\n`;
-                }
-                content += `\t\t\t(print, Unload X set to #<_rc_x_unload> for magazine ${i})\n`;
-                content += `\t\t\t#<_rc_y_unload> = #<_rc${i}_pckt_one_y>\n`;
-                content += `\t\t\t(print, Unload Y set to #<_rc_y_unload> for magazine ${i})\n`;
-                content += `\t\to21${i} else\n`;
-                content += `\t\t\t#<_rc_x_unload> = #<_rc${i}_pckt_one_x>\n`;
-                content += `\t\t\t(print, Unload X set to #<_rc_x_unload> for magazine ${i})\n`;
-                if (i === 1) {
-                    content += `\t\t\t#<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc${i}_direction>] + #<_rc${i}_pckt_one_y>]\n`;
-                } else {
-                    content += `\t\t\t#<_temp1> = [${previousCumulative} + 1]\n`;
-                    content += `\t\t\t#<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
-                    content += `\t\t\t#<_temp3> = [#<_temp2> * #<_rc_pocket_offset>]\n`;
-                    content += `\t\t\t#<_temp4> = [#<_temp3> * #<_rc${i}_direction>]\n`;
-                    content += `\t\t\t#<_rc_y_unload> = [#<_temp4> + #<_rc${i}_pckt_one_y>]\n`;
-                }
-                content += `\t\t\t(print, Unload Y set to #<_rc_y_unload> for magazine ${i}, Y alignment)\n`;
-                content += `\t\to21${i} endif\n`;
-            }
-            content += '\to205 endif\n\n';
-
-            // Determine selected magazine logic
-            content += '\t; Determine selected magazine based on selected tool number\n';
-            for (let i = 1; i <= data.magazineCount; i++) {
-                const cumulative = data.magazines.slice(0, i).reduce((sum, mag) => sum + mag.pockets, 0);
-                const previousCumulative = i === 1 ? 0 : data.magazines.slice(0, i - 1).reduce((sum, mag) => sum + mag.pockets, 0);
-                
-                if (i === 1) {
-                    content += `\to206 if [#<_selected_tool> LE #<_rc${i}_pockets>]\n`;
-                } else if (i === data.magazineCount) {
-                    content += `\to206 else\n`;
-                } else {
-                    content += `\to206 elseif [#<_selected_tool> GT ${previousCumulative} AND #<_selected_tool> LE ${cumulative}]\n`;
-                }
-                
-                content += `\t\t#<_selected_magazine> = ${i}\n`;
-                content += `\t\t(print, Selected tool in magazine #<_selected_magazine>)\n`;
-                
-                // Generate load position calculation
-                content += `\t\to22${i} if [#<_rc${i}_alignment> EQ 0]\n`;
-                if (i === 1) {
-                    content += `\t\t\t#<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc${i}_direction>] + #<_rc${i}_pckt_one_x>]\n`;
-                } else {
-                    content += `\t\t\t#<_temp1> = [${previousCumulative} + 1]\n`;
-                    content += `\t\t\t#<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
-                    content += `\t\t\t#<_temp3> = [#<_temp2> * #<_rc_pocket_offset>]\n';
-                    content += `\t\t\t#<_temp4> = [#<_temp3> * #<_rc${i}_direction>]\n`;
-                    content += `\t\t\t#<_rc_x_load> = [#<_temp4> + #<_rc${i}_pckt_one_x>]\n`;
-                }
-                content += `\t\t\t(print, Load X set to #<_rc_x_load> for magazine ${i})\n`;
-                content += `\t\t\t#<_rc_y_load> = #<_rc${i}_pckt_one_y>\n`;
-                content += `\t\t\t(print, Load Y set to #<_rc_y_load> for magazine ${i})\n`;
-                content += `\t\to22${i} else\n`;
-                content += `\t\t\t#<_rc_x_load> = #<_rc${i}_pckt_one_x>\n`;
-                content += `\t\t\t(print, Load X set to #<_rc_x_load> for magazine ${i})\n`;
-                if (i === 1) {
-                    content += `\t\t\t#<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc${i}_direction>] + #<_rc${i}_pckt_one_y>]\n`;
-                } else {
-                    content += `\t\t\t#<_temp1> = [${previousCumulative} + 1]\n`;
-                    content += `\t\t\t#<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
-                    content += `\t\t\t#<_temp3> = [#<_temp2> * #<_rc_pocket_offset>]\n`;
-                    content += `\t\t\t#<_temp4> = [#<_temp3> * #<_rc${i}_direction>]\n`;
-                    content += `\t\t\t#<_rc_y_load> = [#<_temp4> + #<_rc${i}_pckt_one_y>]\n`;
-                }
-                content += `\t\t\t(print, Load Y set to #<_rc_y_load> for magazine ${i}, Y alignment)\n`;
-                content += `\t\to22${i} endif\n`;
-            }
-            content += '\to206 endif\n\n';
-
-            return content;
-        }
-
-        // Generate unload logic
-        function generateUnloadLogic(data) {
-            let content = '';
-            
-            content += '\t; ************** BEGIN UNLOAD **************\n';
-            content += '\t; Unload current tool\n\n';
-            
-            content += '\to300 if [#<_current_tool> EQ 0 ]\n';
-            content += '\t\t; We have tool 0. Do nothing as we are already unloaded.\n';
-            content += '\t\t(print, Unloaded tool 0)\n';
-            
-            const totalPockets = data.magazineCount === 1 ? 
-                '#<_rc_pockets>' : 
-                data.magazines.map((_, i) => `#<_rc${i+1}_pockets>`).join(' + ');
-            
-            content += `\to300 elseif [#<_current_tool> GT [${totalPockets}]]\n`;
-            content += '\t\t; Tool out of magazine range. Unload manually\n';
-            content += '\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
-            content += '\t\t(print, Tool #<_current_tool> is out of magazine range. Manually remove tool #<_current_tool> and cycle start to continue.)\n';
-            content += '\t\tM0\n';
-            content += '\t\t(print, Unloaded tool out of range)\n';
-            content += '\to300 else\n';
-            content += '\t\t; We have a tool with a pocket\n';
-            content += '\t\tG53 G0 X[#<_rc_x_unload>] Y[#<_rc_y_unload>]\n';
-            content += '\t\t(print, Move to pocket #<_current_tool>)\n';
-            content += '\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
-            content += '\t\t(print, Move to spin start)\n';
-            content += '\t\tM4 S[#<_rc_unload_rpm>]\n';
-            content += '\t\t(print, Run spindle CCW)\n';
-            content += '\t\tG4 P3\n';
-            content += '\t\t(print, Wait 3 seconds for spindle to get to rpm)\n';
-            content += '\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t(print, Engage)\n';
-            content += '\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t(print, Retreat)\n\n';
-            
-            // Tool recognition logic
-            content += '\t\t; Confirm tool unloaded\n';
-            content += '\t\to310 if [#<_rc_recognize> EQ 1]\n';
-            content += '\t\t\tG53 G0 Z[#<_rc_zone_one_z>]\n';
-            content += '\t\t\t(print, Move to zone 1)\n';
-            content += '\t\t\tG4 P0.05\n';
-            content += '\t\t\tM66 P[#<_rc_rec_input>] L0\n';
-            content += '\t\t\t(print, Read input: #5399)\n\n';
-            content += '\t\t\to320 if [#5399 EQ 1]\n';
-            content += '\t\t\t\t(print, Input read timed out)\n';
-            content += '\t\t\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
-            content += '\t\t\t\t(print, Go to spindle start)\n';
-            content += '\t\t\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t\t\t(print, Engage)\n';
-            content += '\t\t\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t\t\t(print, Retreat)\n';
-            content += '\t\t\t\tM5\n';
-            content += '\t\t\t\tG53 G0 Z[#<_rc_zone_one_z>]\n';
-            content += '\t\t\t\t(print, Move to zone 1)\n';
-            content += '\t\t\t\tG4 P0.05\n';
-            content += '\t\t\t\tM66 P[#<_rc_rec_input>] L0\n';
-            content += '\t\t\t\t(print, Input read again: #5399)\n';
-            content += '\t\t\t\to330 if [#5399 EQ 1]\n';
-            content += '\t\t\t\t\t(print, Input read timed out again)\n';
-            content += '\t\t\t\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t\t\t\t(print, Go to safe clearance)\n';
-            content += '\t\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
-            content += '\t\t\t\t\t(print, Tool #<_current_tool> failed to unload. Please manually unload tool #<_current_tool> and cycle start to continue.)\n';
-            content += '\t\t\t\t\tM0\n';
-            content += '\t\t\t\to330 else\n';
-            content += '\t\t\t\t\tG53 G0 Z[#<_rc_to_load_z>]\n';
-            content += '\t\t\t\t\t(print, Go to move to load)\n';
-            content += '\t\t\t\to330 endif\n';
-            content += '\t\t\to320 else\n';
-            content += '\t\t\t\tM5\n';
-            content += '\t\t\t\tG53 G0 Z[#<_rc_to_load_z>]\n';
-            content += '\t\t\t\t(print, Go to move to load)\n';
-            content += '\t\t\to320 endif\n';
-            content += '\t\to310 else\n';
-            content += '\t\t\tM5\n';
-            content += '\t\t\t(print, Stop spindle)\n';
-            content += '\t\t\tG53 G0 Z[#<_rc_to_load_z>]\n';
-            content += '\t\t\t(print, Go to move to load)\n';
-            content += '\t\t\t(print, Confirm tool #<_current_tool> is unloaded and press cycle start to continue.)\n';
-            content += '\t\t\tM0\n';
-            content += '\t\to310 endif\n';
-            content += '\to300 endif\n';
-            content += '\t; *************** END UNLOAD ***************\n\n';
-            
-            return content;
-        }
-
-        // Generate load logic
-        function generateLoadLogic(data) {
-            let content = '';
-            
-            content += '\t; *************** BEGIN LOAD ***************\n';
-            content += '\to400 if [[#<_selected_tool> EQ 0]]\n';
-            content += '\t\t; We selected tool tool 0.\n';
-            content += '\t\t; Go to safe z.\n';
-            content += '\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t(print, Moved to safe clearance)\n';
-            content += '\t        ; reset TLO to 0\n';
-            content += '\t        G43.1 Z0\n';
-            content += '\t        (print, G43.1 Z offset removed)\n';
-            content += '\t        M61 Q0\n';
-            content += '\t        #<_rc_tool1_offset> = 0\n';
-            content += '\t        #<_rc_tool1_offset_referenced> = 0\n';
-            
-            const totalPockets = data.magazineCount === 1 ? 
-                '#<_rc_pockets>' : 
-                data.magazines.map((_, i) => `#<_rc${i+1}_pockets>`).join(' + ');
-            
-            content += `\to400 elseif [#<_selected_tool> LE [${totalPockets}]]\n`;
-            content += '\t\t; We have a tool with a pocket\n';
-            content += '\t\tG53 G0 X[#<_rc_x_load>] Y[#<_rc_y_load>]\n';
-            content += '\t\t(print, Move to pocket #<_selected_tool>)\n';
-            content += '\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
-            content += '\t\t(print, Move to spin start)\n';
-            content += '\t\tG53 G1 Z[#<_rc_load_spin_z>] F[#<_rc_engage_feed>]\n';
-            content += '\t\tM3 S[#<_rc_load_rpm>]\n';
-            content += '\t\t(print, Run spindle CW)\n';
-            content += '\t\tG4 P3\n';
-            content += '\t\t(print, Wait 3 seconds for spindle to get to rpm)\n\n';
-            
-            content += '\t\t#<_rc_times_plunged> = 0\n';
-            content += '\t\to410 while [#<_rc_times_plunged> LT #<_rc_plunge_count>]\n';
-            content += '\t\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t\t(print, Engage)\n';
-            content += '\t\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
-            content += '\t\t\t(print, Retreat)\n';
-            content += '\t\t\t#<_rc_times_plunged> = [#<_rc_times_plunged> + 1]\n';
-            content += '\t\t\t(print, Load plunge #<_rc_times_plunged> complete)\n';
-            content += '\t\t\tG4 P1.5\n';
-            content += '\t\t\t(print, Wait 1.5 seconds for spindle to get to rpm)\n';
-            content += '\t\to410 endwhile\n\n';
-            
-            content += '\t\tM5\n';
-            content += '\t\t(print, Stop spindle)\n\n';
-            
-            // Load confirmation logic
-            content += '\t\t; Confirm Load\n';
-            content += '\t\to420 if [#<_rc_recognize> EQ 1]\n';
-            content += '\t\t\t(print, Tool Recognition Enabled)\n';
-            content += '\t\t\tG53 G0 Z[#<_rc_zone_one_z>]\n';
-            content += '\t\t\t(print, Move to zone 1)\n';
-            content += '\t\t\tG4 P0.05\n';
-            content += '\t\t\tM66 P[#<_rc_rec_input>] L0\n';
-            content += '\t\t\t(print, Read input: #5399)\n\n';
-            content += '\t\t\to430 if [#5399 EQ 0]\n';
-            content += '\t\t\t\t(print, Failed Zone 1)\n';
-            content += '\t\t\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t\t\t(print, Moved to safe clearance)\n';
-            content += '\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
-            content += '\t\t\t\t(print, Tool #<_selected_tool> failed to load zone 1. Manually load tool #<_selected_tool> and cycle start to continue.)\n';
-            content += '\t\t\t\tM0\n';
-            content += '\t\t\t\t(print, Manually loaded tool after failure)\n';
-            content += '\t\t\to430 else\n';
-            content += '\t\t\t\t(print, Passed Zone 1)\n';
-            content += '\t\t\t\tG53 G0 Z[#<_rc_zone_two_z>]\n';
-            content += '\t\t\t\t(print, Move to zone 2)\n';
-            content += '\t\t\t\tG4 P0.05\n';
-            content += '\t\t\t\tM66 P[#<_rc_rec_input>] L0\n';
-            content += '\t\t\t\t(print, Read input: #5399)\n';
-            content += '\t\t\t\to440 if [#5399 EQ 1]\n';
-            content += '\t\t\t\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t\t\t\t(print, Moved to safe clearance)\n';
-            content += '\t\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
-            content += '\t\t\t\t\t(print, Tool #<_selected_tool> failed to load Zone 2. Manually load tool #<_selected_tool> and cycle start to continue.)\n';
-            content += '\t\t\t\t\tM0\n';
-            content += '\t\t\t\t\t(print, Manually loaded tool after failure)\n';
-            content += '\t\t\t\to440 else\n';
-            content += '\t\t\t\t\tG53 G0 Z[#<_rc_to_measure_z>]\n';
-            content += '\t\t\t\t\t(print, Move to measure z)\n';
-            content += '\t\t\t\to440 endif\n';
-            content += '\t\t\to430 endif\n';
-            content += '\t\to420 else\n';
-            content += '\t\t\t(print, Tool recognition disabled)\n';
-            content += '\t\t\tG53 G0 Z[#<_rc_to_measure_z>]\n';
-            content += '\t\t\t(print, Move to measure z)\n';
-            content += '\t\t\t(print, Confirm tool #<_selected_tool> is loaded and press cycle start to continue.)\n';
-            content += '\t\t\tM0\n';
-            content += '\t\to420 endif\n';
-            content += '\to400 else\n';
-            content += '\t\t; Tool out of magazine range. Load manually\n';
-            content += '\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
-            content += '\t\t(print, Tool #<_selected_tool> is out of magazine range. Manually load tool #<_selected_tool> and cycle start to continue.)\n';
-            content += '\t\tM0\n';
-            content += '\t\t(print, Loaded tool out of range)\n';
-            content += '\to400 endif\n\n';
-            
-            content += '\t; Update the current tool.\n';
-            content += '\t    M61 Q[#<_selected_tool>]\n';
-            content += '\tG4 P0.05\n';
-            content += '\t(print, Loaded tool #<_current_tool>)\n';
-            content += '\t; *************** END LOAD *****************\n\n';
-            
-            return content;
-        }
-
-        // Generate measurement logic
-        function generateMeasurementLogic(data) {
-            let content = '';
-            
-            content += '\t; ************* BEGIN MEASURE **************\n\n';
-            content += '\to600 if [#<_rc_measure> EQ 1 AND #<_current_tool> NE 0]\n';
-            content += '\t\t; Tool measure is enabled and we have a tool.\n\n';
-            content += '\t\tG53 G90 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t(print, Move to Z safe)\n';
-            content += '\t\tG53 G0 X[#<_rc_measure_x>] Y[#<_rc_measure_y>]\n';
-            content += '\t\t(print, Move to tool setter XY)\n';
-            content += '\t\tG53 G0 Z[#<_rc_measure_start_z>]\n';
-            content += '\t\tG4 P0.05\n\n';
-            content += '\t\t(print, Down to Z seek start)\n';
-            content += '\t\tG38.2 G91 Z[#<_rc_seek_dist> * -1] F[#<_rc_seek_feed>]\n';
-            content += '\t\t(print, Probe Z down seek mode)\n';
-            content += '\t\tG0 G91 Z[#<_rc_retract_dist>]\n';
-            content += '\t\t(print, Retract from tool setter)\n';
-            content += '\t\tG38.2 G91 Z[#<_rc_set_distance> * -1] F[#<_rc_set_feed>]\n';
-            content += '\t\t(print, Probe Z down set mode)\n';
-            content += '\t\tG53 G0 G90 Z[#<_rc_safe_z>]\n';
-            content += '\t\t(print, Triggered Work Z: #5063)\n\n';
-            content += '\t\to620 if[#<_rc_tool1_offset_referenced> EQ 0]\n';
-            content += '\t\t\t#<_rc_tool1_offset> = #5063\n';
-            content += '\t\t\t#<_rc_tool1_offset_referenced> = 1\n';
-            content += '\t\t        (print, first tool referenced)\n';
-            content += '\t\to620 else\n';
-            content += '\t\t\t#<_rc_trigger_mach_z> = [#5063 - #<_rc_tool1_offset>]\n';
-            content += '\t\t\t(print, 5063: #5063)\n';
-            content += '\t\t\t(print, tool1 offset #<_rc_tool1_offset>)\n';
-            content += '\t\t\t(print, Triggered Mach Z: #<_rc_trigger_mach_z>)\n';
-            content += '\t\t\tG4 P0.05\n';
-            content += '\t\t\tG43.1 Z[#<_rc_trigger_mach_z>]\n';
-            content += '\t\t\t(print, Ref Mach Pos: 0, Work Z after G43.1: #<_z>)\n';
-            content += '\t\to620 endif\n';
-            content += '\to600 else\n';
-            content += '\t\t; Tool measure is disabled\n';
-            content += '\t\t(print, Tool measurement disabled)\n';
-            content += '\t\tG53 G0 Z[#<_rc_safe_z>]\n';
-            content += '\t\t(print, Moved to safe clearance)\n';
-            content += '\to600 endif\n';
-            content += '\t; ************* END MEASURE ****************\n\n';
-            
-            return content;
-        }
-
-        // Generate teardown logic
-        function generateTeardownLogic(data) {
-            let content = '';
-            
-            content += '\t; ************ BEGIN TEARDOWN **************\n';
-            content += '\t; Close the dust cover if enabled.\n';
-            content += '\to550 if [#<_rc_cover_mode> EQ 1]\n';
-            content += '\t\t; Axis Mode: move along the configured axis to the close position.\n';
-            content += '\t\to560 if [#<_rc_cover_axis> EQ 3]\n';
-            content += '\t\t\tG53 G0 A[#<_rc_cover_c_pos>]\n';
-            content += '\t\to560 elseif [#<_rc_cover_axis> EQ 4]\n';
-            content += '\t\t\tG53 G0 B[#<_rc_cover_c_pos>]\n';
-            content += '\t\to560 elseif [#<_rc_cover_axis> EQ 5]\n';
-            content += '\t\t\tG53 G0 C[#<_rc_cover_c_pos>]\n';
-            content += '\t\to560 endif\n';
-            content += '\to550 elseif [#<_rc_cover_mode> EQ 2]\n';
-            content += '\t\t; Output Mode: Turn off the output and dwell\n';
-            content += '\t\tG4 P0.05\n';
-            content += '\t\tM64 P[#<_rc_cover_output>]\n';
-            content += '\t\tG4 P[#<_rc_cover_dwell>]\n';
-            content += '\t\t(print, Dwell for cover)\n';
-            content += '\to550 endif\n\n';
-            content += '\t; Restore units\n';
-            content += '\tG[#<_rc_return_units>]\n';
-            content += '\t(print, Units restored)\n';
-            content += '\t(print, Tool change complete)\n\n\n';
-            content += '\t; ************* END TEARDOWN ***************\n\n';
-            
-            return content;
-        }
-
-        // Helper function to get ordinal numbers
-        function getOrdinal(num) {
-            const ordinals = {
-                1: '1st', 2: '2nd', 3: '3rd', 4: '4th',
-                5: '5th', 6: '6th', 7: '7th', 8: '8th'
-            };
-            return ordinals[num] || `${num}th`;
-        }
-
-        // Show preview of generated files
-        function showPreview() {
-            document.getElementById('previewInit').textContent = generatedFiles.init;
-            document.getElementById('previewTc').textContent = generatedFiles.tc;
-            document.getElementById('previewSection').classList.remove('hidden');
-        }
-
-        // Show download section
-        function showDownloadSection() {
-            document.getElementById('downloadSection').classList.remove('hidden');
-        }
-
-        // Download file function
-        function downloadFile(type) {
-            const content = generatedFiles[type];
-            const filename = type === 'init' ? 'init.nc' : 'tc.nc';
-            
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-
-        // Reset form function
-        function resetForm() {
-            document.getElementById('atcForm').reset();
-            document.getElementById('downloadSection').classList.add('hidden');
-            document.getElementById('previewSection').classList.add('hidden');
-            updateMagazineConfigs(); // Reset magazine configs to default
-            showMessage('Form reset successfully!', 'success');
-        }
-
-        // Show message function
-        function showMessage(message, type) {
-            // Create a temporary message element
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type;
-            messageDiv.textContent = message;
-            messageDiv.style.position = 'fixed';
-            messageDiv.style.top = '20px';
-            messageDiv.style.right = '20px';
-            messageDiv.style.padding = '15px';
-            messageDiv.style.borderRadius = '5px';
-            messageDiv.style.backgroundColor = type === 'success' ? '#d4edda' : '#f8d7da';
-            messageDiv.style.border = '1px solid ' + (type === 'success' ? '#28a745' : '#dc3545');
-            messageDiv.style.zIndex = '1000';
-            
-            document.body.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                document.body.removeChild(messageDiv);
-            }, 3000);
-        }
+        console.log('Script initialization complete');
     </script>
 </body>
 </html>
