@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1008px; /* Increased by 20% from 840px */
+            max-width: none;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -49,9 +49,17 @@
             padding: 30px;
         }
 
+        /* Form wrapper for responsive grid layout */
+        #atcForm {
+            display: block;
+        }
+
         /* Form section wrapper for grid items */
         .form-section {
             margin-bottom: 10px;
+            max-width: 1008px; /* Increased by 20% from 840px */
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .form-section-full-width {
@@ -59,37 +67,40 @@
         }
 
         /* Dynamic responsive grid layout for wider screens */
-        /* When window width allows n sections side by side, create n columns */
-        @media (min-width: 2016px) { /* 2 * 1008px */
-            .form-container {
+        /* When window width allows multiple sections side by side, create columns */
+        @media (min-width: 1800px) { /* When there's room for 2 sections */
+            #atcForm {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 30px;
-                max-width: 2100px;
+                max-width: 2200px;
                 margin: 0 auto;
-                padding: 30px;
+            }
+            
+            .form-section {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
             }
         }
         
-        @media (min-width: 3024px) { /* 3 * 1008px */
-            .form-container {
+        @media (min-width: 2800px) { /* When there's room for 3 sections */
+            #atcForm {
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
                 gap: 30px;
-                max-width: 3150px;
+                max-width: 3300px;
                 margin: 0 auto;
-                padding: 30px;
             }
         }
         
-        @media (min-width: 4032px) { /* 4 * 1008px */
-            .form-container {
+        @media (min-width: 3800px) { /* When there's room for 4 sections */
+            #atcForm {
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr 1fr;
                 gap: 30px;
-                max-width: 4200px;
+                max-width: 4400px;
                 margin: 0 auto;
-                padding: 30px;
             }
         }
 
@@ -443,8 +454,6 @@
                     </div>
                 </div>
 
-                                    </div>
-
                 <!-- Spindle Settings -->
                 <div class="form-section">
                     <button type="button" class="collapsible">Spindle Settings</button>
@@ -466,8 +475,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Manual Tool Change -->
+                <!-- Manual Tool Change -->
+                <div class="form-section">
                     <button type="button" class="collapsible">Manual Tool Change</button>
                     <div class="content">
                         <div class="form-row">
@@ -481,8 +492,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Dust Cover -->
+                <!-- Dust Cover -->
+                <div class="form-section">
                     <button type="button" class="collapsible">Dust Cover</button>
                     <div class="content">
                         <div class="form-row">
@@ -525,8 +538,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Tool Recognition -->
+                <!-- Tool Recognition -->
+                <div class="form-section">
                     <button type="button" class="collapsible">Tool Recognition</button>
                     <div class="content">
                         <div class="form-row">
@@ -553,8 +568,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Tool Measurement -->
+                <!-- Tool Measurement -->
+                <div class="form-section">
                     <button type="button" class="collapsible">Tool Measurement</button>
                     <div class="content">
                         <div class="form-row">
@@ -610,6 +627,7 @@
                 </div>
 
                 <!-- Action Buttons -->
+                <div class="form-section form-section-full-width">
                     <div class="button-group">
                         <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
                         <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
@@ -635,6 +653,7 @@
                             <div class="preview-content" id="previewTc"></div>
                         </div>
                     </div>
+                </div>
             </form>
         </div>
     </div>
