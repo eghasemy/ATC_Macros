@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: none;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -29,7 +29,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #666666 0%, #444444 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -47,6 +47,61 @@
 
         .form-container {
             padding: 30px;
+        }
+
+        /* Form wrapper for responsive grid layout */
+        #atcForm {
+            display: block;
+        }
+
+        /* Form section wrapper for grid items */
+        .form-section {
+            margin-bottom: 10px;
+            max-width: 1008px; /* Increased by 20% from 840px */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .form-section-full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Dynamic responsive grid layout for wider screens */
+        /* When window width allows multiple sections side by side, create columns */
+        @media (min-width: 1800px) { /* When there's room for 2 sections */
+            #atcForm {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                max-width: 2200px;
+                margin: 0 auto;
+            }
+            
+            .form-section {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+        
+        @media (min-width: 2800px) { /* When there's room for 3 sections */
+            #atcForm {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 30px;
+                max-width: 3300px;
+                margin: 0 auto;
+            }
+        }
+        
+        @media (min-width: 3800px) { /* When there's room for 4 sections */
+            #atcForm {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 30px;
+                max-width: 4400px;
+                margin: 0 auto;
+            }
         }
 
         .collapsible {
@@ -71,7 +126,7 @@
         }
 
         .collapsible.active {
-            background-color: #007bff;
+            background-color: #666666;
             color: white;
         }
 
@@ -140,8 +195,8 @@
         input[type="number"]:focus,
         select:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+            border-color: #666666;
+            box-shadow: 0 0 0 3px rgba(102,102,102,0.1);
         }
 
         .magazine-config {
@@ -153,7 +208,7 @@
         }
 
         .magazine-config h3 {
-            color: #007bff;
+            color: #555555;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
@@ -167,7 +222,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(135deg, #666666 0%, #444444 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -183,7 +238,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            box-shadow: 0 4px 15px rgba(102,102,102,0.3);
         }
 
         .btn:active {
@@ -191,16 +246,16 @@
         }
 
         .btn.secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            background: linear-gradient(135deg, #777777 0%, #555555 100%);
         }
 
         .btn.secondary:hover {
-            box-shadow: 0 4px 15px rgba(108,117,125,0.3);
+            box-shadow: 0 4px 15px rgba(119,119,119,0.3);
         }
 
         .download-section {
-            background-color: #e8f5e8;
-            border: 2px solid #28a745;
+            background-color: #f0f0f0;
+            border: 2px solid #888888;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
@@ -208,7 +263,7 @@
         }
 
         .download-btn {
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            background: linear-gradient(135deg, #888888 0%, #666666 100%);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -223,7 +278,7 @@
 
         .download-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+            box-shadow: 0 4px 15px rgba(136,136,136,0.3);
         }
 
         .preview-section {
@@ -260,6 +315,13 @@
             display: none;
         }
 
+        .description {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
         .error {
             color: #dc3545;
             font-size: 14px;
@@ -288,276 +350,311 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>FluidNC ATC Configuration Generator</h1>
-            <p>Generate init.nc and tc.nc files for your automatic tool changer</p>
+            <h1>ATC Configuration Generator</h1>
+            <p>Generate configuration files for your automatic tool changer</p>
         </div>
 
         <div class="form-container">
             <form id="atcForm">
-                <!-- Magazine Configuration -->
-                <button type="button" class="collapsible active">Magazine Configuration</button>
-                <div class="content active">
-                    <div class="form-group">
-                        <label for="magazineCount">Number of Magazines (1-8):</label>
-                        <select id="magazineCount" name="magazineCount">
-                            <option value="1">1 Magazine</option>
-                            <option value="2">2 Magazines</option>
-                            <option value="3">3 Magazines</option>
-                            <option value="4">4 Magazines</option>
-                            <option value="5">5 Magazines</option>
-                            <option value="6">6 Magazines</option>
-                            <option value="7">7 Magazines</option>
-                            <option value="8">8 Magazines</option>
-                        </select>
-                    </div>
-
-                    <div id="magazineConfigs">
-                        <!-- Magazine configurations will be dynamically inserted here -->
+                <!-- Firmware Selection -->
+                <div class="form-section">
+                <button type="button" class="collapsible active">Firmware Selection</button>
+                    <div class="content active">
+                        <div class="form-group">
+                            <label for="firmware">Target Firmware:</label>
+                            <select id="firmware" name="firmware">
+                                <option value="fluidnc" selected>FluidNC</option>
+                                <option value="grblhal">grblHAL</option>
+                            </select>
+                            <div id="firmwareDescription" class="description">
+                                Select the firmware for which you want to generate configuration files.
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Basic Settings -->
-                <button type="button" class="collapsible">Basic Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="units">Units:</label>
-                            <select id="units" name="units">
-                                <option value="20">Inches (20)</option>
-                                <option value="21" selected>Millimeters (21)</option>
+                    <!-- Magazine Configuration -->
+                    <div class="form-section">
+                    <button type="button" class="collapsible active">Magazine Configuration</button>
+                    <div class="content active">
+                        <div class="form-group">
+                            <label for="magazineCount">Number of Magazines (1-8):</label>
+                            <select id="magazineCount" name="magazineCount">
+                                <option value="1">1 Magazine</option>
+                                <option value="2">2 Magazines</option>
+                                <option value="3">3 Magazines</option>
+                                <option value="4">4 Magazines</option>
+                                <option value="5">5 Magazines</option>
+                                <option value="6">6 Magazines</option>
+                                <option value="7">7 Magazines</option>
+                                <option value="8">8 Magazines</option>
                             </select>
                         </div>
-                        <div class="form-col">
-                            <label for="pocketOffset">Pocket Offset:</label>
-                            <input type="number" id="pocketOffset" name="pocketOffset" value="35" step="0.1">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Z-Axis Settings -->
-                <button type="button" class="collapsible">Z-Axis Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="engageZ">Engage Z Position:</label>
-                            <input type="number" id="engageZ" name="engageZ" value="-141.5" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="loadSpinZ">Load Spindle Start Z:</label>
-                            <input type="number" id="loadSpinZ" name="loadSpinZ" value="-125" step="0.1">
+                        <div id="magazineConfigs">
+                            <!-- Magazine configurations will be dynamically inserted here -->
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="toLoadZ">Move To Load Z:</label>
-                            <input type="number" id="toLoadZ" name="toLoadZ" value="-80" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="toMeasureZ">Move To Measure Z:</label>
-                            <input type="number" id="toMeasureZ" name="toMeasureZ" value="-80" step="0.1">
+                    </div>
+
+                    <!-- Basic Settings -->
+                    <div class="form-section">
+                    <button type="button" class="collapsible">Basic Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="units">Units:</label>
+                                <select id="units" name="units">
+                                    <option value="20">Inches (20)</option>
+                                    <option value="21" selected>Millimeters (21)</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="pocketOffset">Pocket Offset:</label>
+                                <input type="number" id="pocketOffset" name="pocketOffset" value="35" step="0.1">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="safeZ">Safe Clearance Z:</label>
-                            <input type="number" id="safeZ" name="safeZ" value="-80" step="0.1">
+                    </div>
+
+                    <!-- Z-Axis Settings -->
+                    <div class="form-section">
+                    <button type="button" class="collapsible">Z-Axis Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="engageZ">Engage Z Position:</label>
+                                <input type="number" id="engageZ" name="engageZ" value="-141.5" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="loadSpinZ">Load Spindle Start Z:</label>
+                                <input type="number" id="loadSpinZ" name="loadSpinZ" value="-125" step="0.1">
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="plungeCount">Load Plunge Count:</label>
-                            <input type="number" id="plungeCount" name="plungeCount" value="2" min="1" max="10">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="toLoadZ">Move To Load Z:</label>
+                                <input type="number" id="toLoadZ" name="toLoadZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="toMeasureZ">Move To Measure Z:</label>
+                                <input type="number" id="toMeasureZ" name="toMeasureZ" value="-80" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="safeZ">Safe Clearance Z:</label>
+                                <input type="number" id="safeZ" name="safeZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="plungeCount">Load Plunge Count:</label>
+                                <input type="number" id="plungeCount" name="plungeCount" value="2" min="1" max="10">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Spindle Settings -->
-                <button type="button" class="collapsible">Spindle Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="engageFeed">Engage Feed Rate:</label>
-                            <input type="number" id="engageFeed" name="engageFeed" value="2000" min="1">
+                <div class="form-section">
+                    <button type="button" class="collapsible">Spindle Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="engageFeed">Engage Feed Rate:</label>
+                                <input type="number" id="engageFeed" name="engageFeed" value="2000" min="1">
+                            </div>
+                            <div class="form-col">
+                                <label for="unloadRpm">Unload RPM (CCW):</label>
+                                <input type="number" id="unloadRpm" name="unloadRpm" value="2000" min="1">
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="unloadRpm">Unload RPM (CCW):</label>
-                            <input type="number" id="unloadRpm" name="unloadRpm" value="2000" min="1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="loadRpm">Load RPM (CW):</label>
-                            <input type="number" id="loadRpm" name="loadRpm" value="1600" min="1">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="loadRpm">Load RPM (CW):</label>
+                                <input type="number" id="loadRpm" name="loadRpm" value="1600" min="1">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Manual Tool Change -->
-                <button type="button" class="collapsible">Manual Tool Change</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="manualX">Manual Change X Position:</label>
-                            <input type="number" id="manualX" name="manualX" value="100" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="manualY">Manual Change Y Position:</label>
-                            <input type="number" id="manualY" name="manualY" value="50" step="0.1">
+                <div class="form-section">
+                    <button type="button" class="collapsible">Manual Tool Change</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="manualX">Manual Change X Position:</label>
+                                <input type="number" id="manualX" name="manualX" value="100" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="manualY">Manual Change Y Position:</label>
+                                <input type="number" id="manualY" name="manualY" value="50" step="0.1">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Dust Cover -->
-                <button type="button" class="collapsible">Dust Cover</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverMode">Dust Cover Mode:</label>
-                            <select id="coverMode" name="coverMode">
-                                <option value="0" selected>Disabled</option>
-                                <option value="1">Axis</option>
-                                <option value="2">Output</option>
-                            </select>
+                <div class="form-section">
+                    <button type="button" class="collapsible">Dust Cover</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverMode">Dust Cover Mode:</label>
+                                <select id="coverMode" name="coverMode">
+                                    <option value="0" selected>Disabled</option>
+                                    <option value="1">Axis</option>
+                                    <option value="2">Output</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="coverAxis">Dust Cover Axis (if Axis mode):</label>
+                                <select id="coverAxis" name="coverAxis">
+                                    <option value="0" selected>None</option>
+                                    <option value="3">A Axis</option>
+                                    <option value="4">B Axis</option>
+                                    <option value="5">C Axis</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="coverAxis">Dust Cover Axis (if Axis mode):</label>
-                            <select id="coverAxis" name="coverAxis">
-                                <option value="0" selected>None</option>
-                                <option value="3">A Axis</option>
-                                <option value="4">B Axis</option>
-                                <option value="5">C Axis</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverClosedPos">Closed Position:</label>
+                                <input type="number" id="coverClosedPos" name="coverClosedPos" value="0" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="coverOpenPos">Open Position:</label>
+                                <input type="number" id="coverOpenPos" name="coverOpenPos" value="0" step="0.1">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverClosedPos">Closed Position:</label>
-                            <input type="number" id="coverClosedPos" name="coverClosedPos" value="0" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="coverOpenPos">Open Position:</label>
-                            <input type="number" id="coverOpenPos" name="coverOpenPos" value="0" step="0.1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverOutput">Output Number (if Output mode):</label>
-                            <input type="number" id="coverOutput" name="coverOutput" value="0" min="0">
-                        </div>
-                        <div class="form-col">
-                            <label for="coverDwell">Dwell Time (seconds):</label>
-                            <input type="number" id="coverDwell" name="coverDwell" value="1" step="0.1" min="0">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverOutput">Output Number (if Output mode):</label>
+                                <input type="number" id="coverOutput" name="coverOutput" value="0" min="0">
+                            </div>
+                            <div class="form-col">
+                                <label for="coverDwell">Dwell Time (seconds):</label>
+                                <input type="number" id="coverDwell" name="coverDwell" value="1" step="0.1" min="0">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tool Recognition -->
-                <button type="button" class="collapsible">Tool Recognition</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="recognize">Tool Recognition Mode:</label>
-                            <select id="recognize" name="recognize">
-                                <option value="0" selected>Disabled - User confirmation only</option>
-                                <option value="1">Enabled</option>
-                            </select>
+                <div class="form-section">
+                    <button type="button" class="collapsible">Tool Recognition</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="recognize">Tool Recognition Mode:</label>
+                                <select id="recognize" name="recognize">
+                                    <option value="0" selected>Disabled - User confirmation only</option>
+                                    <option value="1">Enabled</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="recInput">IR Sensor Input Number:</label>
+                                <input type="number" id="recInput" name="recInput" value="0" min="0">
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="recInput">IR Sensor Input Number:</label>
-                            <input type="number" id="recInput" name="recInput" value="0" min="0">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="zoneOneZ">Zone 1 Z Position:</label>
-                            <input type="number" id="zoneOneZ" name="zoneOneZ" value="-63.5" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="zoneTwoZ">Zone 2 Z Position:</label>
-                            <input type="number" id="zoneTwoZ" name="zoneTwoZ" value="-57.0" step="0.1">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="zoneOneZ">Zone 1 Z Position:</label>
+                                <input type="number" id="zoneOneZ" name="zoneOneZ" value="-63.5" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="zoneTwoZ">Zone 2 Z Position:</label>
+                                <input type="number" id="zoneTwoZ" name="zoneTwoZ" value="-57.0" step="0.1">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tool Measurement -->
-                <button type="button" class="collapsible">Tool Measurement</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measure">Tool Measurement Mode:</label>
-                            <select id="measure" name="measure">
-                                <option value="0">Disabled</option>
-                                <option value="1" selected>Enabled</option>
-                            </select>
+                <div class="form-section">
+                    <button type="button" class="collapsible">Tool Measurement</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measure">Tool Measurement Mode:</label>
+                                <select id="measure" name="measure">
+                                    <option value="0">Disabled</option>
+                                    <option value="1" selected>Enabled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measureX">Tool Setter X Position:</label>
+                                <input type="number" id="measureX" name="measureX" value="1184.7" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="measureY">Tool Setter Y Position:</label>
+                                <input type="number" id="measureY" name="measureY" value="74.7" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measureStartZ">Measurement Start Z:</label>
+                                <input type="number" id="measureStartZ" name="measureStartZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="seekDist">Seek Distance:</label>
+                                <input type="number" id="seekDist" name="seekDist" value="150" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="retractDist">Retract Distance:</label>
+                                <input type="number" id="retractDist" name="retractDist" value="1" step="0.1" min="0">
+                            </div>
+                            <div class="form-col">
+                                <label for="seekFeed">Seek Feed Rate:</label>
+                                <input type="number" id="seekFeed" name="seekFeed" value="500" min="1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="setFeed">Set Feed Rate:</label>
+                                <input type="number" id="setFeed" name="setFeed" value="25" min="1">
+                            </div>
+                            <div class="form-col">
+                                <label for="tloRef">TLO Reference Position:</label>
+                                <input type="number" id="tloRef" name="tloRef" value="0" step="0.1">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measureX">Tool Setter X Position:</label>
-                            <input type="number" id="measureX" name="measureX" value="1184.7" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="measureY">Tool Setter Y Position:</label>
-                            <input type="number" id="measureY" name="measureY" value="74.7" step="0.1">
-                        </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-section form-section-full-width">
+                    <div class="button-group">
+                        <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
+                        <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measureStartZ">Measurement Start Z:</label>
-                            <input type="number" id="measureStartZ" name="measureStartZ" value="-80" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="seekDist">Seek Distance:</label>
-                            <input type="number" id="seekDist" name="seekDist" value="150" step="0.1" min="0">
-                        </div>
+
+                    <!-- Download Section -->
+                    <div id="downloadSection" class="download-section hidden">
+                        <h3>Files Generated Successfully!</h3>
+                        <p>Your configuration files are ready for download:</p>
+                        <a href="#" id="downloadInitBtn" class="download-btn">Download</a>
+                        <a href="#" id="downloadTcBtn" class="download-btn">Download</a>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="retractDist">Retract Distance:</label>
-                            <input type="number" id="retractDist" name="retractDist" value="1" step="0.1" min="0">
+
+                    <!-- Preview Section -->
+                    <div id="previewSection" class="preview-section hidden">
+                        <h3>File Preview</h3>
+                        <div class="preview-file">
+                            <div class="preview-header" id="previewInitHeader">Configuration File</div>
+                            <div class="preview-content" id="previewInit"></div>
                         </div>
-                        <div class="form-col">
-                            <label for="seekFeed">Seek Feed Rate:</label>
-                            <input type="number" id="seekFeed" name="seekFeed" value="500" min="1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="setFeed">Set Feed Rate:</label>
-                            <input type="number" id="setFeed" name="setFeed" value="25" min="1">
-                        </div>
-                        <div class="form-col">
-                            <label for="tloRef">TLO Reference Position:</label>
-                            <input type="number" id="tloRef" name="tloRef" value="0" step="0.1">
+                        <div class="preview-file">
+                            <div class="preview-header" id="previewTcHeader">Tool Change File</div>
+                            <div class="preview-content" id="previewTc"></div>
                         </div>
                     </div>
                 </div>
             </form>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
-                <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
-            </div>
-
-            <!-- Download Section -->
-            <div id="downloadSection" class="download-section hidden">
-                <h3>Files Generated Successfully!</h3>
-                <p>Your configuration files are ready for download:</p>
-                <a href="#" id="downloadInitBtn" class="download-btn">Download init.nc</a>
-                <a href="#" id="downloadTcBtn" class="download-btn">Download tc.nc</a>
-            </div>
-
-            <!-- Preview Section -->
-            <div id="previewSection" class="preview-section hidden">
-                <h3>File Preview</h3>
-                <div class="preview-file">
-                    <div class="preview-header">init.nc</div>
-                    <div class="preview-content" id="previewInit"></div>
-                </div>
-                <div class="preview-file">
-                    <div class="preview-header">tc.nc</div>
-                    <div class="preview-content" id="previewTc"></div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -568,6 +665,26 @@
         let generatedFiles = {
             init: '',
             tc: ''
+        };
+
+        // Store firmware-specific file extensions and names
+        const firmwareConfig = {
+            fluidnc: {
+                initExt: '.nc',
+                tcExt: '.nc', 
+                initName: 'init',
+                tcName: 'tc',
+                printCmd: 'print',
+                errorCmd: '$Alarm/Send=3'
+            },
+            grblhal: {
+                initExt: '.macro',
+                tcExt: '.macro',
+                initName: 'P200',
+                tcName: 'TC',
+                printCmd: 'debug',
+                errorCmd: 'M0\n  M99'
+            }
         };
 
         // Initialize the page
@@ -582,6 +699,9 @@
             
             // Initialize event listeners
             initializeEventListeners();
+            
+            // Initialize firmware UI immediately
+            updateUIForFirmware();
             
             console.log('All initializations completed successfully');
         });
@@ -707,9 +827,58 @@
             return positions[magazineNum] || '72.6';
         }
 
+        // Update UI elements based on selected firmware
+        function updateUIForFirmware() {
+            const firmware = document.getElementById('firmware').value;
+            const config = firmwareConfig[firmware];
+            
+            // Update download button text
+            const downloadInitBtn = document.getElementById('downloadInitBtn');
+            const downloadTcBtn = document.getElementById('downloadTcBtn');
+            
+            if (downloadInitBtn) {
+                downloadInitBtn.textContent = `Download ${config.initName}${config.initExt}`;
+            }
+            if (downloadTcBtn) {
+                downloadTcBtn.textContent = `Download ${config.tcName}${config.tcExt}`;
+            }
+            
+            // Update preview headers
+            const previewInitHeader = document.getElementById('previewInitHeader');
+            const previewTcHeader = document.getElementById('previewTcHeader');
+            
+            if (previewInitHeader) {
+                previewInitHeader.textContent = `${config.initName}${config.initExt}`;
+            }
+            if (previewTcHeader) {
+                previewTcHeader.textContent = `${config.tcName}${config.tcExt}`;
+            }
+            
+            console.log('UI updated for firmware:', firmware);
+        }
+
+        // Helper function to generate print/debug commands based on firmware
+        function generatePrintCmd(config, message, variable = null) {
+            if (variable) {
+                return '(' + config.printCmd + ',' + message + ': ' + variable + ')';
+            } else {
+                return '(' + config.printCmd + ',' + message + ')';
+            }
+        }
+
         // Initialize event listeners
         function initializeEventListeners() {
             console.log('Initializing event listeners...');
+            
+            // Firmware selector change event
+            const firmwareSelect = document.getElementById('firmware');
+            if (firmwareSelect) {
+                firmwareSelect.addEventListener('change', function() {
+                    console.log('Firmware changed to:', this.value);
+                    updateUIForFirmware();
+                });
+                console.log('Firmware selector event listener added');
+            }
             
             // Magazine selector change event
             const magazineCountSelect = document.getElementById('magazineCount');
@@ -748,14 +917,18 @@
             if (downloadInitBtn) {
                 downloadInitBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    downloadFile(generatedFiles.init, 'init.nc');
+                    const firmware = document.getElementById('firmware').value;
+                    const config = firmwareConfig[firmware];
+                    downloadFile(generatedFiles.init, config.initName + config.initExt);
                 });
             }
             
             if (downloadTcBtn) {
                 downloadTcBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    downloadFile(generatedFiles.tc, 'tc.nc');
+                    const firmware = document.getElementById('firmware').value;
+                    const config = firmwareConfig[firmware];
+                    downloadFile(generatedFiles.tc, config.tcName + config.tcExt);
                 });
             }
         }
@@ -797,6 +970,7 @@
         // Collect Form Data
         function collectFormData() {
             const formData = {
+                firmware: document.getElementById('firmware').value,
                 magazineCount: parseInt(document.getElementById('magazineCount').value),
                 magazines: [],
                 // Basic settings
@@ -876,39 +1050,40 @@
 
         // Generate init.nc file content
         function generateInitNc(formData) {
+            const config = firmwareConfig[formData.firmware];
             let content = '';
             
-            // Header comment
+            // Header comment - no copyright section
             content += '; ******** BEGIN USER CONFIGURATION ********\n';
             content += '; ATC Operations\n';
             content += '; The units for your configuration: 20 = Inches, 21 = Millimeters\n';
             content += `#<_rc_units> = ${formData.units}\n`;
-            content += '(print,Units: #<_rc_units>)\n\n';
+            content += '(' + config.printCmd + ',Units: #<_rc_units>)\n\n';
 
             if (formData.magazineCount === 1) {
                 // Single magazine format
                 const mag = formData.magazines[0];
                 content += '; The number of pockets in your magazine.\n';
                 content += `#<_rc_pockets> = ${mag.pockets}\n`;
-                content += '(print,Pockets: #<_rc_pockets>)\n\n';
+                content += '(' + config.printCmd + ',Pockets: #<_rc_pockets>)\n\n';
                 
                 content += '; The pocket offset for your magazine.\n';
                 content += `#<_rc_pocket_offset> = ${formData.pocketOffset}\n`;
-                content += '(print,Pocket Offset: #<_rc_pocket_offset>)\n\n';
+                content += '(' + config.printCmd + ',Pocket Offset: #<_rc_pocket_offset>)\n\n';
                 
                 content += '; The axis along which the magazine is aligned: 0 = X Axis, 1 = Y Axis.\n';
                 content += `#<_rc_alignment> = ${mag.alignment}\n`;
-                content += '(print,Alignment: #<_rc_alignment>)\n\n';
+                content += '(' + config.printCmd + ',Alignment: #<_rc_alignment>)\n\n';
                 
                 content += '; The direction of travel from pocket 1 to pocket 2: 1 = Positive, -1 = Negative.\n';
                 content += `#<_rc_direction> = ${mag.direction}\n`;
-                content += '(print,Direction: #<_rc_direction>)\n\n';
+                content += '(' + config.printCmd + ',Direction: #<_rc_direction>)\n\n';
                 
                 content += '; The X an Y machine coordinate positions of pocket 1.\n';
                 content += `#<_rc_pocket_one_x> = ${mag.pocketOneX}\n`;
-                content += '(print,Pocket 1 X: #<_rc_pocket_one_x>)\n\n';
+                content += '(' + config.printCmd + ',Pocket 1 X: #<_rc_pocket_one_x>)\n\n';
                 content += `#<_rc_pocket_one_y> = ${mag.pocketOneY}\n`;
-                content += '(print,Pocket 1 Y: #<_rc_pocket_one_y>)\n\n';
+                content += '(' + config.printCmd + ',Pocket 1 Y: #<_rc_pocket_one_y>)\n\n';
             } else {
                 // Multi-magazine format
                 for (let i = 0; i < formData.magazineCount; i++) {
@@ -917,12 +1092,15 @@
                     
                     content += `; The number of pockets in your ${getOrdinal(magNum)} magazine.\n`;
                     content += `#<_rc${magNum}_pockets> = ${mag.pockets}\n`;
-                    content += `(print,Pockets: #<_rc${magNum}_pockets>)\n\n`;
+                    content += `(` + config.printCmd + `,Pockets: #<_rc${magNum}_pockets>)\n\n`;
                 }
                 
                 content += '; The pocket offset for your magazines.\n';
-                content += `#<_rc_pocket_offset> = ${formData.pocketOffset}\n`;
-                content += '(print,Pocket Offset: #<_rc_pocket_offset>)\n\n';
+                for (let i = 0; i < formData.magazineCount; i++) {
+                    const magNum = i + 1;
+                    content += `#<_rc${magNum}_pocket_offset> = ${formData.pocketOffset}\n`;
+                    content += '(' + config.printCmd + `,Pocket Offset: #<_rc${magNum}_pocket_offset>)\n\n`;
+                }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
                     const mag = formData.magazines[i];
@@ -930,7 +1108,7 @@
                     
                     content += `; The axis along which the ${getOrdinal(magNum)} magazine is aligned: 0 = X Axis, 1 = Y Axis.\n`;
                     content += `#<_rc${magNum}_alignment> = ${mag.alignment}\n`;
-                    content += `(print,Alignment: #<_rc${magNum}_alignment>)\n\n`;
+                    content += `(` + config.printCmd + `,Alignment: #<_rc${magNum}_alignment>)\n\n`;
                 }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
@@ -939,7 +1117,7 @@
                     
                     content += `; The direction of travel from pocket 1 to pocket 2 for the ${getOrdinal(magNum)} magazine: 1 = Positive, -1 = Negative.\n`;
                     content += `#<_rc${magNum}_direction> = ${mag.direction}\n`;
-                    content += `(print,Direction: #<_rc${magNum}_direction>)\n\n`;
+                    content += `(` + config.printCmd + `,Direction: #<_rc${magNum}_direction>)\n\n`;
                 }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
@@ -948,139 +1126,139 @@
                     
                     content += `; The X an Y machine coordinate positions of pocket 1 of the ${getOrdinal(magNum)} magazine.\n`;
                     content += `#<_rc${magNum}_pckt_one_x> = ${mag.pocketOneX}\n`;
-                    content += `(print,Pocket 1 X: #<_rc${magNum}_pckt_one_x>)\n\n`;
+                    content += `(` + config.printCmd + `,Pocket 1 X: #<_rc${magNum}_pckt_one_x>)\n\n`;
                     content += `#<_rc${magNum}_pckt_one_y> = ${mag.pocketOneY}\n`;
-                    content += `(print,Pocket 1 Y: #<_rc${magNum}_pckt_one_y>)\n\n`;
+                    content += `(` + config.printCmd + `,Pocket 1 Y: #<_rc${magNum}_pckt_one_y>)\n\n`;
                 }
             }
 
             // Common settings (same for both single and multi)
-            content += generateCommonInitSettings(formData);
+            content += generateCommonInitSettings(formData, config);
 
             return content;
         }
 
         // Generate common init.nc settings
-        function generateCommonInitSettings(formData) {
+        function generateCommonInitSettings(formData, config) {
             let content = '';
             
             content += '; The Z machine coordinate positon of engagement.\n';
             content += `#<_rc_engage_z> = ${formData.engageZ}\n`;
-            content += '(print,Engage Z: #<_rc_engage_z>)\n\n';
+            content += '(' + config.printCmd + ',Engage Z: #<_rc_engage_z>)\n\n';
             
             content += '; The Z machine coordinate position at which to start the spindle when loading.\n';
             content += `#<_rc_load_spin_z> = ${formData.loadSpinZ}\n`;
-            content += '(print,Load Spindle Start Z: #<_rc_load_spin_z>)\n\n';
+            content += '(' + config.printCmd + ',Load Spindle Start Z: #<_rc_load_spin_z>)\n\n';
             
             content += '; The number of times to plunge when loading.\n';
             content += `#<_rc_plunge_count> = ${formData.plungeCount}\n`;
-            content += '(print,Load Plunge Count: #<_rc_plunge_count>)\n\n';
+            content += '(' + config.printCmd + ',Load Plunge Count: #<_rc_plunge_count>)\n\n';
             
             content += '; The Z machine coordinate position to rise to after unloading, before moving to load. (No Tool Loaded RV)\n';
             content += `#<_rc_to_load_z> = ${formData.toLoadZ}\n`;
-            content += '(print,Move To Load Z: #<_rc_to_load_z>)\n\n';
+            content += '(' + config.printCmd + ',Move To Load Z: #<_rc_to_load_z>)\n\n';
             
             content += '; The Z machine coordinate position to rise to after loading, before moving to meeasure.\n';
             content += `#<_rc_to_measure_z> = ${formData.toMeasureZ}\n`;
-            content += '(print,Move To Measure Z: #<_rc_to_measure_z>)\n\n';
+            content += '(' + config.printCmd + ',Move To Measure Z: #<_rc_to_measure_z>)\n\n';
             
             content += '; The Z machine coordinate position for clearing all obstacles.\n';
             content += `#<_rc_safe_z> = ${formData.safeZ}\n`;
-            content += '(print,Safe Clearance Z: #<_rc_safe_z>)\n\n';
+            content += '(' + config.printCmd + ',Safe Clearance Z: #<_rc_safe_z>)\n\n';
             
             content += '; The feed rate for engagement.\n';
             content += `#<_rc_engage_feed> = ${formData.engageFeed}\n`;
-            content += '(print,Engage Feed Rate: #<_rc_engage_feed>)\n\n';
+            content += '(' + config.printCmd + ',Engage Feed Rate: #<_rc_engage_feed>)\n\n';
             
             content += '; Spindle speed CCW\n';
             content += `#<_rc_unload_rpm> = ${formData.unloadRpm}\n`;
-            content += '(print,Unload RPM: #<_rc_unload_rpm>)\n\n';
+            content += '(' + config.printCmd + ',Unload RPM: #<_rc_unload_rpm>)\n\n';
             
             content += '; Spindle speed CW\n';
             content += `#<_rc_load_rpm> = ${formData.loadRpm}\n`;
-            content += '(print,Load RPM: #<_rc_load_rpm>)\n\n';
+            content += '(' + config.printCmd + ',Load RPM: #<_rc_load_rpm>)\n\n';
             
             content += '; Manual Tool Change\n';
             content += '; X and Y machine coordinates to move to for a manual load/unload.\n';
             content += `#<_rc_manual_x> = ${formData.manualX}\n`;
-            content += '(print,Manual X: #<_rc_manual_x>)\n';
+            content += '(' + config.printCmd + ',Manual X: #<_rc_manual_x>)\n';
             content += `#<_rc_manual_y> = ${formData.manualY}\n`;
-            content += '(print,Manual Y: #<_rc_manual_y>)\n\n';
+            content += '(' + config.printCmd + ',Manual Y: #<_rc_manual_y>)\n\n';
             
             content += '; Dust Cover\n';
             content += '; The dust cover operational mode: 0 = Disabled, 1 = Axis, 2 = Output\n';
             content += `#<_rc_cover_mode> = ${formData.coverMode}\n`;
-            content += '(print,Dust Cover Mode: #<_rc_cover_mode>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Mode: #<_rc_cover_mode>)\n\n';
             
             content += '; The axis for axis mode: 3 = A Axis, 4 = B Axis, 5 = C Axis\n';
             content += `#<_rc_cover_axis> = ${formData.coverAxis}\n`;
-            content += '(print,Dust Cover Axis: #<_rc_cover_axis>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Axis: #<_rc_cover_axis>)\n\n';
             
             content += '; The machine coordinate closed position for axis mode.\n';
             content += `#<_rc_cover_c_pos> = ${formData.coverClosedPos}\n`;
-            content += '(print,Dust Cover Closed Pos: #<_rc_cover_c_pos>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Closed Pos: #<_rc_cover_c_pos>)\n\n';
             
             content += '; The machine coordinate open position for axis mode.\n';
             content += `#<_rc_cover_o_pos> = ${formData.coverOpenPos}\n`;
-            content += '(print,Dust Cover Open Pos: #<_rc_cover_o_pos>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Open Pos: #<_rc_cover_o_pos>)\n\n';
             
             content += '; The output number for output mode.\n';
             content += `#<_rc_cover_output> = ${formData.coverOutput}\n`;
-            content += '(print,Dust Cover Output: #<_rc_cover_output>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Output: #<_rc_cover_output>)\n\n';
             
             content += '; The time to dwell in output mode to allow the cover to fully open/close before moving.\n';
             content += `#<_rc_cover_dwell> = ${formData.coverDwell}\n`;
-            content += '(print,Dust Cover Dwell: #<_rc_cover_dwell>)\n\n';
+            content += '(' + config.printCmd + ',Dust Cover Dwell: #<_rc_cover_dwell>)\n\n';
             
             content += '; Tool Recognition\n';
             content += '; Tool recognition mode: 0 = Disabled-User confirmation only, 1 = Enabled\n';
             content += `#<_rc_recognize> = ${formData.recognize}\n`;
-            content += '(print,Tool Recognition Enabled: #<_rc_recognize>)\n\n';
+            content += '(' + config.printCmd + ',Tool Recognition Enabled: #<_rc_recognize>)\n\n';
             
             content += '; IR sensor input number.\n';
             content += `#<_rc_rec_input> = ${formData.recInput}\n`;
-            content += '(print,Tool Recognition Input: #<_rc_rec_input>)\n\n';
+            content += '(' + config.printCmd + ',Tool Recognition Input: #<_rc_rec_input>)\n\n';
             
             content += '; Z Machine coordinate positions tool recognition.\n';
             content += `#<_rc_zone_one_z> = ${formData.zoneOneZ}\n`;
-            content += '(print,Tool Recognition Zone 1 Z: #<_rc_zone_one_z>)\n';
+            content += '(' + config.printCmd + ',Tool Recognition Zone 1 Z: #<_rc_zone_one_z>)\n';
             content += `#<_rc_zone_two_z> = ${formData.zoneTwoZ}\n`;
-            content += '(print,Tool Recognition Zone 2 Z: #<_rc_zone_two_z>)\n\n';
+            content += '(' + config.printCmd + ',Tool Recognition Zone 2 Z: #<_rc_zone_two_z>)\n\n';
             
             content += '; Tool Measurement\n';
             content += '; Tool measurement mode: 0 = Disabled, 1 = Enabled\n';
             content += `#<_rc_measure> = ${formData.measure}\n`;
-            content += '(print,Tool Measure Enabled: #<_rc_measure>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Enabled: #<_rc_measure>)\n\n';
             
             content += '; X and Y machine coordinate positions of the tool setter.\n';
             content += `#<_rc_measure_x> = ${formData.measureX}\n`;
-            content += '(print,Tool Measure X: #<_rc_measure_x>)\n';
+            content += '(' + config.printCmd + ',Tool Measure X: #<_rc_measure_x>)\n';
             content += `#<_rc_measure_y> = ${formData.measureY}\n`;
-            content += '(print,Tool Measure Y: #<_rc_measure_y>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Y: #<_rc_measure_y>)\n\n';
             
             content += '; Z machine coordinate position at which to begin the initial probe.\n';
             content += `#<_rc_measure_start_z> = ${formData.measureStartZ}\n`;
-            content += '(print,Tool Measure Start Z: #<_rc_measure_start_z>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Start Z: #<_rc_measure_start_z>)\n\n';
             
             content += '; The distance to probe in search of the tool setter for the initial probe.\n';
             content += `#<_rc_seek_dist> = ${formData.seekDist}\n`;
-            content += '(print,Tool Measure Seek Distance: #<_rc_seek_dist>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Seek Distance: #<_rc_seek_dist>)\n\n';
             
             content += '; The distance to retract after the initial probe trigger.\n';
             content += `#<_rc_retract_dist> = ${formData.retractDist}\n\n`;
-            content += '(print,Tool Measure Retract Distance: #<_rc_retract_dist>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Retract Distance: #<_rc_retract_dist>)\n\n';
             
             content += '; The feed rate for the initial probe.\n';
             content += `#<_rc_seek_feed> = ${formData.seekFeed}\n`;
-            content += '(print,Tool Measure Seek Feed Rate: #<_rc_seek_feed>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Seek Feed Rate: #<_rc_seek_feed>)\n\n';
             
             content += '; The feed rate for the second probe.\n';
             content += `#<_rc_set_feed> = ${formData.setFeed}\n`;
-            content += '(print,Tool Measure Set Feed Rate: #<_rc_set_feed>)\n\n';
+            content += '(' + config.printCmd + ',Tool Measure Set Feed Rate: #<_rc_set_feed>)\n\n';
             
             content += '; The optional reference position for TLO. This may remain at it\'s default of 0 or be customized.\n';
             content += `#<_rc_tlo_ref> = ${formData.tloRef}\n`;
-            content += '(print,Tool Measure TLO Ref Pos: #<_rc_tlo_ref>)\n';
+            content += '(' + config.printCmd + ',Tool Measure TLO Ref Pos: #<_rc_tlo_ref>)\n';
             content += '; ********* END USER CONFIGURATION *********\n\n';
             
             // Calculated settings section
@@ -1102,10 +1280,10 @@
             
             content += '; The flag indicating that the settings have been loaded into memory.\n';
             content += '#1001 = 1\n';
-            content += '(print,Flag Set: #1001)\n';
-            content += '(print,RapidChange ATC Configuration Loaded)\n';
+            content += '(' + config.printCmd + ',Flag Set: #1001)\n';
+            content += '(' + config.printCmd + ',RapidChange ATC Configuration Loaded)\n';
             content += '; ******** END CALCULATED SETTINGS ***********\n';
-            content += '(print, Current tool #<_current_tool> Selected Tool #<_selected_tool> 5400 #5400)\n';
+            content += '(' + config.printCmd + ', Current tool #<_current_tool> Selected Tool #<_selected_tool> 5400 #5400)\n';
             content += '#<_rc_tool1_offset_referenced> = 0\n';
             content += '#<_rc_tool1_offset> = 0\n';
             content += 'G43.1 Z0\n';
@@ -1130,453 +1308,831 @@
 
         // Generate single magazine tc.nc
         function generateSingleMagazineTc(formData) {
-            return `; ************ BEGIN VALIDATION ************
-o50 if [#1001 NE 1]
-\t(print, RapidChange settings are not initialized.)
-\t(print, Abort operation and initialize RapidChange settings.)
-\t$Alarm/Send=3
-o50 elseif [#<_selected_tool> LT 0]
-\t(print, Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)
-\t$Alarm/Send=3
-o50 elseif [#<_selected_tool> EQ #<_current_tool>]
-\t(print, Current tool selected. Tool change bypassed.)
-o50 else
-\t(print, Tool change validated)
-\t; ************* END VALIDATION *************
+            const config = firmwareConfig[formData.firmware];
+            
+            let content = '';
+            
+            // No copyright section - start with validation
+            content += '; ************ BEGIN VALIDATION ************\n';
+            content += 'o50 if [#1001 NE 1]\n';
+            content += '\t(' + config.printCmd + ', RapidChange settings are not initialized.)\n';
+            content += '\t(' + config.printCmd + ', Abort operation and initialize RapidChange settings.)\n';
 
-\t; ************** BEGIN SETUP ***************
-\t; Turn off spindle and coolant
-\tM5
-\tM9
-\t(print, Spindle and coolant turned off)
+            if (formData.firmware === 'grblhal') {
+                content += '\t(' + config.printCmd + ', Program has been paused with M0.)\n';
+                content += '\t' + config.errorCmd + '\n';
+            } else {
+                content += '\t' + config.errorCmd + '\n';
+            }
 
-\t; Record current units
-\to200 if [#<_metric> EQ 0]
-\t\t#<_rc_return_units> = 20
-\to200 else
-\t\t#<_rc_return_units> = 21
-\to200 endif
-\t(print, Units recorded)
+            content += 'o50 endif\n\n';
 
-\t; Activate configured units and absolute distance mode
-\tG[#<_rc_units>] G90
-\t(print, Set units and distance)
+            content += 'o100 if [#<_selected_tool> LT 0]\n';
+            content += '\t(' + config.printCmd + ', Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)\n';
 
-\t; Set pocket locations
-\to210 if [#<_rc_alignment> EQ 0]
-\t\t#<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]
-\t\t(print, Load X set to #<_rc_x_load>)
-\t\t#<_rc_y_load> = #<_rc_pocket_one_y>
-\t\t(print, Load Y set to #<_rc_y_load>)
+            if (formData.firmware === 'grblhal') {
+                content += '\t' + config.errorCmd + '\n';
+            } else {
+                content += '\t' + config.errorCmd + '\n';
+            }
 
-\t\t#<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]
-\t\t(print, Unload X set to #<_rc_x_unload>)
-\t\t#<_rc_y_unload> = #<_rc_pocket_one_y>
-\t\t(print, Unload Y set to #<_rc_y_unload>)
-\t\t(print, Pocket locations set for X alignment)
-\to210 else
-\t\t#<_rc_x_load> = #<_rc_pocket_one_x>
-\t\t(print, Load X set to #<_rc_x_load>)
-\t\t#<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]
-\t\t(print, Load Y set to #<_rc_y_load>)
+            content += 'o100 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
+            content += '\t(' + config.printCmd + ', Current tool selected. Tool change bypassed.)\n';
 
-\t\t#<_rc_x_unload> = #<_rc_pocket_one_x>
-\t\t(print, Unload X set to #<_rc_x_unload>)
-\t\t#<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]
-\t\t(print, Unload Y set to #<_rc_y_unload>)
-\t\t(print, Pocket locations set for Y alignment)
-\to210 endif
+            if (formData.firmware === 'grblhal') {
+                content += '\tM99\n';
+            }
 
-\tG53 G0 Z[#<_rc_safe_z>]
-\t(print, Moved to safe clearance)
+            content += 'o100 endif\n';
+            content += '(' + config.printCmd + ', Tool change validated)\n';
+            content += '; ************* END VALIDATION *************\n\n';
 
-\t; Open the dust cover if enabled.
-\to500 if [#<_rc_cover_mode> EQ 1]
-\t\t; Axis Mode: move along the configured axis to the open position.
-\t\to510 if [#<_rc_cover_axis> EQ 3]
-\t\t\tG53 G0 A[#<_rc_cover_o_pos>]
-\t\to510 elseif [#<_rc_cover_axis> EQ 4]
-\t\t\tG53 G0 B[#<_rc_cover_o_pos>]
-\t\to510 elseif [#<_rc_cover_axis> EQ 5]
-\t\t\tG53 G0 C[#<_rc_cover_o_pos>]
-\t  o510 endif
-\to500 elseif [#<_rc_cover_mode> EQ 2]
-\t  ; Output Mode: Turn on the output and dwell
-\t  G4 P0.05
-\t  M65 P[#<_rc_cover_output>]
-\t  G4 P[#<_rc_cover_dwell>]
-\to500 endif
-\t; *************** END SETUP ****************
+            // Setup section
+            content += '; ************** BEGIN SETUP ***************\n';
+            content += '; Turn off spindle and coolant\n';
+            content += 'M5\n';
+            content += 'M9\n';
+            content += '(' + config.printCmd + ', Spindle and coolant turned off)\n\n';
 
-\t; ************** BEGIN UNLOAD **************
-\t; Unload current tool
+            content += '; Record current units\n';
+            content += 'o200 if [#<_metric> EQ 0]\n';
+            content += '  #<_rc_return_units> = 20\n';
+            content += 'o200 else\n';
+            content += '  #<_rc_return_units> = 21\n';
+            content += 'o200 endif\n';
+            content += '(' + config.printCmd + ', Units recorded)\n\n';
 
+            content += '; Activate configured units and absolute distance mode\n';
+            content += 'G[#<_rc_units>] G90\n';
+            content += '(' + config.printCmd + ', Set units and distance)\n\n';
 
-\to300 if [#<_current_tool> EQ 0 ]
-\t\t; We have tool 0. Do nothing as we are already unloaded.
-\t\t(print, Unloaded tool 0)
-\to300 elseif [#<_current_tool> GT [#<_rc_pockets>]]
-\t\t; Tool out of magazine range. Unload manually
-\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]
-\t\t(print, Tool #<_current_tool> is out of magazine range. Manually remove tool #<_current_tool> and cycle start to continue.)
-\t\tM0
-\t\t(print, Unloaded tool out of range)
-\to300 else
-\t\t; We have a tool with a pocket
-\t\tG53 G0 X[#<_rc_x_unload>] Y[#<_rc_y_unload>]
-\t\t(print, Move to pocket #<_current_tool>)
-\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]
-\t\t(print, Move to spin start)
-\t\tM4 S[#<_rc_unload_rpm>]
-\t\t(print, Run spindle CCW)
-\t\tG4 P3
-\t\t(print, Wait 1 second for spindle to get to rpm)
-\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]
-\t\t(print, Engage)
-\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]
-\t\t(print, Retreat)
-\t  
-\t\t; Confirm tool unloaded
-\t\to310 if [#<_rc_recognize> EQ 1]
-\t\t\tG53 G0 Z[#<_rc_zone_one_z>]
-\t\t\t(print, Move to zone 1)
-\t\t\tG4 P0.05
-\t\t\tM66 P[#<_rc_rec_input>] L0
-\t\t\t(print, Read input: #5399)
+            // Pocket calculations for single magazine
+            content += '; Set pocket locations\n';
+            content += 'o210 if [#<_rc_alignment> EQ 0]\n';
+            content += '  #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
+            content += '  (' + config.printCmd + ', Unload X set to #<_rc_x_unload>)\n';
+            content += '  #<_rc_y_unload> = #<_rc_pocket_one_y>\n';
+            content += '  (' + config.printCmd + ', Unload Y set to #<_rc_y_unload>)\n';
+            content += 'o210 else\n';
+            content += '  #<_rc_x_unload> = #<_rc_pocket_one_x>\n';
+            content += '  (' + config.printCmd + ', Unload X set to #<_rc_x_unload>)\n';
+            content += '  #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
+            content += '  (' + config.printCmd + ', Unload Y set to #<_rc_y_unload>, Y alignment)\n';
+            content += 'o210 endif\n\n';
 
-\t\t\to320 if [#5399 EQ 1]
-\t\t\t\t(print, Input read timed out)
-\t\t\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]
-\t\t\t\t(print, Go to spindle start)
-\t\t\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]
-\t\t\t\t(print, Engage)
-\t\t\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]
-\t\t\t\t(print, Retreat)
-\t\t\t\tM5
-\t\t\t\tG53 G0 Z[#<_rc_zone_one_z>]
-\t\t\t\t(print, Move to zone 1)
-\t\t\t\tG4 P0.05
-\t\t\t\tM66 P[#<_rc_rec_input>] L0
-\t\t\t\t(print, Input read again: #5399)
-\t\t\t\to330 if [#5399 EQ 1]
-\t\t\t\t\t(print, Input read timed out again)
-\t\t\t\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t\t\t\t(print, Go to safe clearance)
-\t\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]
-\t\t\t\t\t(print, Go to manual position)
-\t\t\t\t\t(print, Tool #<_current_tool> failed to unload. Please manually unload tool #<_current_tool> and cycle start to continue.)
-\t\t\t\t\tM0
-\t\t\t\to330 else
-\t\t\t\t\tG53 G0 Z[#<_rc_to_load_z>]
-\t\t\t\t\t(print, Go to move to load)
-\t\t\t\to330 endif
-\t\t\to320 else
-\t\t\t\tM5
-\t\t\t\tG53 G0 Z[#<_rc_to_load_z>]
-\t\t\t\t(print, Go to move to load)
-\t\t\to320 endif
-\t\to310 else
-\t\t\tM5
-\t\t\t(print, Stop spindle)
-\t\t\tG53 G0 Z[#<_rc_to_load_z>]
-\t\t\t(print, Go to move to load)
-\t\t\t(print, Confirm tool #<_current_tool> is unloaded and press cycle start to continue.)
-\t\t\tM0
-\t\to310 endif
-\to300 endif
-\t; *************** END UNLOAD ***************
+            content += 'o220 if [#<_rc_alignment> EQ 0]\n';
+            content += '  #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
+            content += '  (' + config.printCmd + ', Load X set to #<_rc_x_load>)\n';
+            content += '  #<_rc_y_load> = #<_rc_pocket_one_y>\n';
+            content += '  (' + config.printCmd + ', Load Y set to #<_rc_y_load>)\n';
+            content += 'o220 else\n';
+            content += '  #<_rc_x_load> = #<_rc_pocket_one_x>\n';
+            content += '  (' + config.printCmd + ', Load X set to #<_rc_x_load>)\n';
+            content += '  #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
+            content += '  (' + config.printCmd + ', Load Y set to #<_rc_y_load>, Y alignment)\n';
+            content += 'o220 endif\n\n';
 
-\t; *************** BEGIN LOAD ***************
-\to400 if [[#<_selected_tool> EQ 0]]
-\t\t; We selected tool tool 0.
-\t\t; Go to safe z.
-\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t(print, Moved to safe clearance)
-        ; reset TLO to 0
-        G43.1 Z0
-        (print, G43.1 Z offset removed)
-        M61 Q0
-        #<_rc_tool1_offset> = 0
-        #<_rc_tool1_offset_referenced> = 0
-\to400 elseif [#<_selected_tool> LE #<_rc_pockets>]
-\t\t; We have a tool with a pocket
-\t\tG53 G0 X[#<_rc_x_load>] Y[#<_rc_y_load>]
-\t\t(print, Move to pocket #<_selected_tool>)
-\t\tG53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]
-\t\t(print, Move to spin start)
-\t\tG53 G1 Z[#<_rc_load_spin_z>] F[#<_rc_engage_feed>]
-\t\tM3 S[#<_rc_load_rpm>]
-\t\t(print, Run spindle CW)
-\t\tG4 P3
-\t\t(print, Wait 1 second for spindle to get to rpm)
+            content += 'G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '(' + config.printCmd + ', Moved to safe clearance)\n\n';
 
-\t\t#<_rc_times_plunged> = 0
-\t\to410 while [#<_rc_times_plunged> LT #<_rc_plunge_count>]
-\t\t\tG53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]
-\t\t\t(print, Engage)
-\t\t\tG53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]
-\t\t\t(print, Retreat)
-\t\t\t#<_rc_times_plunged> = [#<_rc_times_plunged> + 1]
-\t\t\t(print, Load plunge #<_rc_times_plunged> complete)
-\t\t\tG4 P1.5
-\t\t\t(print, Wait 1 second for spindle to get to rpm)
-\t\to410 endwhile
+            // Dust cover opening
+            content += '; Open the dust cover if enabled.\n';
+            content += 'o500 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the open position.\n';
+            content += '  o510 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_o_pos>]\n';
+            content += '  o510 endif\n';
+            content += 'o500 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn on the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M64 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += 'o500 endif\n';
+            content += '; *************** END SETUP ****************\n\n';
 
-\t\tM5
-\t\t(print, Stop spindle)
+            // Unload section
+            content += generateSingleMagazineUnloadLogic(formData, config);
 
-\t\t; Confirm Load
-\t\to420 if [#<_rc_recognize> EQ 1]
-\t\t\t(print, Tool Recognition Enabled)
-\t\t\tG53 G0 Z[#<_rc_zone_one_z>]
-\t\t\t(print, Move to zone 1)
-\t\t\tG4 P0.05
-\t\t\tM66 P[#<_rc_rec_input>] L0
-\t\t\t(print, Read input: #5399)
+            // Load section
+            content += generateSingleMagazineLoadLogic(formData, config);
 
-\t\t\to430 if [#5399 EQ 0]
-\t\t\t\t(print, Input read successfully)
-\t\t\t\tG53 G0 Z[#<_rc_zone_two_z>]
-\t\t\t\t(print, Move to zone 2)
-\t\t\t\tG4 P0.05
-\t\t\t\tM66 P[#<_rc_rec_input>] L0
-\t\t\t\t(print, Read input: #5399)
-\t\t\t\to440 if [#5399 EQ 1]
-\t\t\t\t\t(print, Tool #<_selected_tool> loaded successfully)
-\t\t\t\t\tM61 Q[#<_selected_tool>]
-\t\t\t\t\t(print, Tool #<_selected_tool> selected)
-\t\t\t\t\tG53 G0 Z[#<_rc_to_measure_z>]
-\t\t\t\t\t(print, Go to move to measure)
-\t\t\t\to440 else
-\t\t\t\t\t(print, Zone 2 tool recognition failed)
-\t\t\t\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t\t\t\t(print, Go to safe clearance)
-\t\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]
-\t\t\t\t\t(print, Go to manual position)
-\t\t\t\t\t(print, Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)
-\t\t\t\t\tM0
-\t\t\t\t\tM61 Q[#<_selected_tool>]
-\t\t\t\t\t(print, Tool #<_selected_tool> manually loaded)
-\t\t\t\t\tG53 G0 Z[#<_rc_to_measure_z>]
-\t\t\t\t\t(print, Go to move to measure)
-\t\t\t\to440 endif
-\t\t\to430 else
-\t\t\t\t(print, Zone 1 tool recognition failed)
-\t\t\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t\t\t(print, Go to safe clearance)
-\t\t\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]
-\t\t\t\t(print, Go to manual position)
-\t\t\t\t(print, Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)
-\t\t\t\tM0
-\t\t\t\tM61 Q[#<_selected_tool>]
-\t\t\t\t(print, Tool #<_selected_tool> manually loaded)
-\t\t\t\tG53 G0 Z[#<_rc_to_measure_z>]
-\t\t\t\t(print, Go to move to measure)
-\t\t\to430 endif
-\t\to420 else
-\t\t\t(print, Confirm tool #<_selected_tool> is loaded and press cycle start to continue.)
-\t\t\tM0
-\t\t\tM61 Q[#<_selected_tool>]
-\t\t\t(print, Tool #<_selected_tool> loaded)
-\t\t\tG53 G0 Z[#<_rc_to_measure_z>]
-\t\t\t(print, Go to move to measure)
-\t\to420 endif
-\to400 else
-\t\t; Tool out of magazine range. Load manually
-\t\tG53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]
-\t\t(print, Tool #<_selected_tool> is out of magazine range. Manually load tool #<_selected_tool> and cycle start to continue.)
-\t\tM0
-\t\tM61 Q[#<_selected_tool>]
-\t\t(print, Tool #<_selected_tool> manually loaded)
-\t\tG53 G0 Z[#<_rc_to_measure_z>]
-\t\t(print, Go to move to measure)
-\to400 endif
-\t; *************** END LOAD *****************
+            // Measure section
+            content += generateMeasureLogic(formData, config);
 
-\t; ************* BEGIN MEASURE **************
-\to900 if [#<_rc_measure> EQ 1 AND #<_selected_tool> GT 0]
-\t\t; Measure the tool
-\t\tG53 G0 X[#<_rc_measure_x>] Y[#<_rc_measure_y>]
-\t\t(print, Move to tool setter)
-\t\tG53 G0 Z[#<_rc_measure_start_z>]
-\t\t(print, Move to measurement start)
-\t\tG38.2 Z[#<_rc_measure_start_z> - #<_rc_seek_dist>] F[#<_rc_seek_feed>]
-\t\t(print, Probe tool)
-\t\tG53 G0 Z[#5063 + #<_rc_retract_dist>]
-\t\t(print, Retract)
-\t\tG38.2 Z[#5063 - #<_rc_set_distance>] F[#<_rc_set_feed>]
-\t\t(print, Set probe)
-\t\t#<_rc_tool1_offset> = [#5063 - #<_rc_tlo_ref>]
-\t\t#<_rc_tool1_offset_referenced> = 1
-\t\tG43.1 Z[#<_rc_tool1_offset>]
-\t\t(print, Tool offset set: #<_rc_tool1_offset>)
-\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t(print, Go to safe clearance)
-\to900 elseif [#<_selected_tool> GT 0]
-\t\t(print, Tool measurement disabled)
-\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t(print, Go to safe clearance)
-\to900 endif
-\t; ************** END MEASURE ***************
-
-\t; Close the dust cover if enabled.
-\to550 if [#<_rc_cover_mode> EQ 1]
-\t\t; Axis Mode: move along the configured axis to the open position.
-\t\to560 if [#<_rc_cover_axis> EQ 3]
-\t\t\tG53 G0 A[#<_rc_cover_c_pos>]
-\t\to560 elseif [#<_rc_cover_axis> EQ 4]
-\t\t\tG53 G0 B[#<_rc_cover_c_pos>]
-\t\to560 elseif [#<_rc_cover_axis> EQ 5]
-\t\t\tG53 G0 C[#<_rc_cover_c_pos>]
-\t\to560 endif
-\to550 elseif [#<_rc_cover_mode> EQ 2]
-\t\t; Output Mode: Turn on the output and dwell
-\t\tG4 P0.05
-\t\tM64 P[#<_rc_cover_output>]
-\t\tG4 P[#<_rc_cover_dwell>]
-\t\t(print, Dwell for cover)
-\to550 endif
-
-\t; Restore units
-\tG[#<_rc_return_units>]
-\t(print, Units restored)
-\t(print, Tool change complete)
-
-
-o50 endif`;
-        }
-
-        // Generate multi-magazine tc.nc (this is much more complex)
-        function generateMultiMagazineTc(formData) {
-            let content = `; ************ BEGIN VALIDATION ************
-o50 if [#1001 NE 1]
-\t(print, RapidChange settings are not initialized.)
-\t(print, Abort operation and initialize RapidChange settings.)
-\t$Alarm/Send=3
-o50 elseif [#<_selected_tool> LT 0]
-\t(print, Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)
-\t$Alarm/Send=3
-o50 elseif [#<_selected_tool> EQ #<_current_tool>]
-\t(print, Current tool selected. Tool change bypassed.)
-o50 else
-\t(print, Tool change validated)
-\t; ************* END VALIDATION *************
-
-\t; ************** BEGIN SETUP ***************
-\t; Turn off spindle and coolant
-\tM5
-\tM9
-\t(print, Spindle and coolant turned off)
-
-\t; Record current units
-\to200 if [#<_metric> EQ 0]
-\t\t#<_rc_return_units> = 20
-\to200 else
-\t\t#<_rc_return_units> = 21
-\to200 endif
-\t(print, Units recorded)
-
-\t; Activate configured units and absolute distance mode
-\tG[#<_rc_units>] G90
-\t(print, Set units and distance)
-
-\t; Determine current magazine based on current tool number`;
-
-            // Generate the complex magazine determination logic for current tool
-            content += generateMagazineDeterminationLogic(formData, '_current_tool', 'unload');
-
-            // Generate the complex magazine determination logic for selected tool
-            content += `
-\t; Determine selected magazine based on selected tool number`;
-            content += generateMagazineDeterminationLogic(formData, '_selected_tool', 'load');
-
-            // Continue with the rest of the tc.nc logic...
-            content += `
-\tG53 G0 Z[#<_rc_safe_z>]
-\t(print, Moved to safe clearance)
-
-\t; Open the dust cover if enabled.
-\to500 if [#<_rc_cover_mode> EQ 1]
-\t\t; Axis Mode: move along the configured axis to the open position.
-\t\to510 if [#<_rc_cover_axis> EQ 3]
-\t\t\tG53 G0 A[#<_rc_cover_o_pos>]
-\t\to510 elseif [#<_rc_cover_axis> EQ 4]
-\t\t\tG53 G0 B[#<_rc_cover_o_pos>]
-\t\to510 elseif [#<_rc_cover_axis> EQ 5]
-\t\t\tG53 G0 C[#<_rc_cover_o_pos>]
-\t  o510 endif
-\to500 elseif [#<_rc_cover_mode> EQ 2]
-\t  ; Output Mode: Turn on the output and dwell
-\t  G4 P0.05
-\t  M65 P[#<_rc_cover_output>]
-\t  G4 P[#<_rc_cover_dwell>]
-\to500 endif
-\t; *************** END SETUP ****************`;
-
-            // Add unload logic
-            content += generateMultiMagazineUnloadLogic(formData);
-
-            // Add load logic
-            content += generateMultiMagazineLoadLogic(formData);
-
-            // Add measurement logic (same as single magazine)
-            content += `
-\t; ************* BEGIN MEASURE **************
-\to900 if [#<_rc_measure> EQ 1 AND #<_selected_tool> GT 0]
-\t\t; Measure the tool
-\t\tG53 G0 X[#<_rc_measure_x>] Y[#<_rc_measure_y>]
-\t\t(print, Move to tool setter)
-\t\tG53 G0 Z[#<_rc_measure_start_z>]
-\t\t(print, Move to measurement start)
-\t\tG38.2 Z[#<_rc_measure_start_z> - #<_rc_seek_dist>] F[#<_rc_seek_feed>]
-\t\t(print, Probe tool)
-\t\tG53 G0 Z[#5063 + #<_rc_retract_dist>]
-\t\t(print, Retract)
-\t\tG38.2 Z[#5063 - #<_rc_set_distance>] F[#<_rc_set_feed>]
-\t\t(print, Set probe)
-\t\t#<_rc_tool1_offset> = [#5063 - #<_rc_tlo_ref>]
-\t\t#<_rc_tool1_offset_referenced> = 1
-\t\tG43.1 Z[#<_rc_tool1_offset>]
-\t\t(print, Tool offset set: #<_rc_tool1_offset>)
-\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t(print, Go to safe clearance)
-\to900 elseif [#<_selected_tool> GT 0]
-\t\t(print, Tool measurement disabled)
-\t\tG53 G0 Z[#<_rc_safe_z>]
-\t\t(print, Go to safe clearance)
-\to900 endif
-\t; ************** END MEASURE ***************
-
-\t; Close the dust cover if enabled.
-\to550 if [#<_rc_cover_mode> EQ 1]
-\t\t; Axis Mode: move along the configured axis to the open position.
-\t\to560 if [#<_rc_cover_axis> EQ 3]
-\t\t\tG53 G0 A[#<_rc_cover_c_pos>]
-\t\to560 elseif [#<_rc_cover_axis> EQ 4]
-\t\t\tG53 G0 B[#<_rc_cover_c_pos>]
-\t\to560 elseif [#<_rc_cover_axis> EQ 5]
-\t\t\tG53 G0 C[#<_rc_cover_c_pos>]
-\t\to560 endif
-\to550 elseif [#<_rc_cover_mode> EQ 2]
-\t\t; Output Mode: Turn on the output and dwell
-\t\tG4 P0.05
-\t\tM64 P[#<_rc_cover_output>]
-\t\tG4 P[#<_rc_cover_dwell>]
-\t\t(print, Dwell for cover)
-\to550 endif
-
-\t; Restore units
-\tG[#<_rc_return_units>]
-\t(print, Units restored)
-\t(print, Tool change complete)
-
-
-o50 endif`;
+            // Teardown section
+            content += generateTeardownLogic(formData, config);
 
             return content;
         }
 
-        // Generate magazine determination logic for multi-magazine setup
+        // Generate single magazine unload logic
+        function generateSingleMagazineUnloadLogic(formData, config) {
+            const mag = formData.magazines[0];
+            let content = '';
+            
+            content += '; ************** BEGIN UNLOAD **************\n';
+            content += '; Unload current tool\n';
+            content += 'o300 if [#<_current_tool> EQ 0]\n';
+            content += '  ; We have tool 0. Do nothing as we are already unloaded.\n';
+            content += '  (' + config.printCmd + ', Unloaded tool 0)\n';
+            if (formData.firmware === 'grblhal') {
+                content += '  M99\n';
+            }
+            content += 'o300 elseif [#<_current_tool> GT #<_rc_pockets>]\n';
+            content += '  ; Tool out of magazine range. Unload manually\n';
+            content += '  G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '  (' + config.printCmd + ', Tool #<_current_tool> is out of magazine range. Manually remove tool #<_current_tool> and cycle start to continue.)\n';
+            content += '  M0\n';
+            content += '  (' + config.printCmd + ', Unloaded tool out of range)\n';
+            content += 'o300 else\n';
+            content += '  ; We have a tool with a pocket\n';
+            content += '  G53 G0 X[#<_rc_x_unload>] Y[#<_rc_y_unload>]\n';
+            content += '  (' + config.printCmd + ', Move to pocket #<_current_tool>)\n';
+            content += '  G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '  (' + config.printCmd + ', Move to spin start)\n';
+            content += '  M4 S[#<_rc_unload_rpm>]\n';
+            content += '  (' + config.printCmd + ', Run spindle CCW)\n';
+            content += '  G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '  (' + config.printCmd + ', Engage)\n';
+            content += '  G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '  (' + config.printCmd + ', Retreat)\n\n';
+            
+            content += '  ; Confirm tool unloaded\n';
+            content += '  o310 if [#<_rc_recognize> EQ 1]\n';
+            content += '    G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '    (' + config.printCmd + ', Move to zone 1)\n';
+            content += '    G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '    M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o320 if [#5399 EQ -1]\n';
+            } else {
+                content += '    M66 P[#<_rc_rec_input>] L0\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o320 if [#5399 EQ 1]\n';
+            }
+            
+            content += '      (' + config.printCmd + ', Input read timed out)\n';
+            content += '      G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '      (' + config.printCmd + ', Go to spindle start)\n';
+            content += '      G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '      (' + config.printCmd + ', Engage)\n';
+            content += '      G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '      (' + config.printCmd + ', Retreat)\n';
+            content += '      M5\n';
+            content += '      G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '      (' + config.printCmd + ', Move to zone 1)\n';
+            content += '      G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '      M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '      (' + config.printCmd + ', Input read again: #5399)\n';
+                content += '      o330 if [#5399 EQ -1]\n';
+            } else {
+                content += '      M66 P[#<_rc_rec_input>] L0\n';
+                content += '      (' + config.printCmd + ', Input read again: #5399)\n';
+                content += '      o330 if [#5399 EQ 1]\n';
+            }
+            
+            content += '        (' + config.printCmd + ', Input read timed out again)\n';
+            content += '        G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '        (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '        G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '        (' + config.printCmd + ', Go to manual position)\n';
+            content += '        (' + config.printCmd + ', Tool #<_current_tool> failed to unload. Please manually unload tool #<_current_tool> and cycle start to continue.)\n';
+            content += '        M0\n';
+            content += '      o330 else\n';
+            content += '        G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to load)\n';
+            content += '      o330 endif\n';
+            content += '    o320 else\n';
+            content += '      M5\n';
+            content += '      G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '      (' + config.printCmd + ', Go to move to load)\n';
+            content += '    o320 endif\n';
+            content += '  o310 else\n';
+            content += '    M5\n';
+            content += '    (' + config.printCmd + ', Stop spindle)\n';
+            content += '    G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '    (' + config.printCmd + ', Go to move to load)\n';
+            content += '    (' + config.printCmd + ', Confirm tool #<_current_tool> is unloaded and press cycle start to continue.)\n';
+            content += '    M0\n';
+            content += '  o310 endif\n';
+            content += 'o300 endif\n';
+            content += '; *************** END UNLOAD ***************\n\n';
+            
+            return content;
+        }
+
+        // Generate single magazine load logic
+        function generateSingleMagazineLoadLogic(formData, config) {
+            let content = '';
+            
+            content += '; *************** BEGIN LOAD ***************\n';
+            content += 'o400 if [#<_selected_tool> EQ 0]\n';
+            content += '  ; We selected tool 0.\n';
+            content += '  ; Go to safe z.\n';
+            content += '  G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Moved to safe clearance)\n';
+            content += '  ; reset TLO to 0\n';
+            content += '  G43.1 Z0\n';
+            content += '  (' + config.printCmd + ', G43.1 Z offset removed)\n';
+            content += '  M61 Q0\n';
+            content += '  #<_rc_tool1_offset> = 0\n';
+            content += '  #<_rc_tool1_offset_referenced> = 0\n';
+            content += 'o400 elseif [#<_selected_tool> LE #<_rc_pockets>]\n';
+            content += '  ; We have a tool with a pocket\n';
+            content += '  G53 G0 X[#<_rc_x_load>] Y[#<_rc_y_load>]\n';
+            content += '  (' + config.printCmd + ', Move to pocket #<_selected_tool>)\n';
+            content += '  G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '  (' + config.printCmd + ', Move to spin start)\n';
+            content += '  G53 G1 Z[#<_rc_load_spin_z>] F[#<_rc_engage_feed>]\n';
+            content += '  M3 S[#<_rc_load_rpm>]\n';
+            content += '  (' + config.printCmd + ', Run spindle CW)\n\n';
+            
+            content += '  #<_rc_times_plunged> = 0\n';
+            content += '  o410 while [#<_rc_times_plunged> LT #<_rc_plunge_count>]\n';
+            content += '    G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '    (' + config.printCmd + ', Engage)\n';
+            content += '    G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '    (' + config.printCmd + ', Retreat)\n';
+            content += '    #<_rc_times_plunged> = [#<_rc_times_plunged> + 1]\n';
+            content += '    (' + config.printCmd + ', Load plunge #<_rc_times_plunged> complete)\n';
+            content += '  o410 endwhile\n\n';
+            
+            content += '  M5\n';
+            content += '  (' + config.printCmd + ', Stop spindle)\n\n';
+            
+            content += '  ; Confirm Load\n';
+            content += '  o420 if [#<_rc_recognize> EQ 1]\n';
+            content += '    (' + config.printCmd + ', Tool Recognition Enabled)\n';
+            content += '    G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '    (' + config.printCmd + ', Move to zone 1)\n';
+            content += '    G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '    M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o430 if [#5399 NE -1]\n';
+                content += '      (' + config.printCmd + ', Failed Zone 1)\n';
+            } else {
+                content += '    M66 P[#<_rc_rec_input>] L0\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o430 if [#5399 EQ 0]\n';
+                content += '      (' + config.printCmd + ', Input read successfully)\n';
+            }
+            
+            content += '      G53 G0 Z[#<_rc_zone_two_z>]\n';
+            content += '      (' + config.printCmd + ', Move to zone 2)\n';
+            content += '      G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '      M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '      (' + config.printCmd + ', Read input: #5399)\n';
+                content += '      o440 if [#5399 EQ -1]\n';
+            } else {
+                content += '      M66 P[#<_rc_rec_input>] L0\n';
+                content += '      (' + config.printCmd + ', Read input: #5399)\n';
+                content += '      o440 if [#5399 EQ 1]\n';
+            }
+            
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> loaded successfully)\n';
+            content += '        M61 Q[#<_selected_tool>]\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> selected)\n';
+            content += '        G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to measure)\n';
+            content += '      o440 else\n';
+            content += '        (' + config.printCmd + ', Zone 2 tool recognition failed)\n';
+            content += '        G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '        (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '        G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '        (' + config.printCmd + ', Go to manual position)\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '        M0\n';
+            content += '        M61 Q[#<_selected_tool>]\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> manually loaded)\n';
+            content += '        G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to measure)\n';
+            content += '      o440 endif\n';
+            content += '    o430 else\n';
+            content += '      (' + config.printCmd + ', Zone 1 tool recognition failed)\n';
+            content += '      G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '      (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '      G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '      (' + config.printCmd + ', Go to manual position)\n';
+            content += '      (' + config.printCmd + ', Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '      M0\n';
+            content += '      M61 Q[#<_selected_tool>]\n';
+            content += '      (' + config.printCmd + ', Tool #<_selected_tool> manually loaded)\n';
+            content += '      G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '      (' + config.printCmd + ', Go to move to measure)\n';
+            content += '    o430 endif\n';
+            content += '  o420 else\n';
+            content += '    (' + config.printCmd + ', Tool recognition disabled)\n';
+            content += '    G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '    (' + config.printCmd + ', Move to measure z)\n';
+            content += '    (' + config.printCmd + ', Confirm tool #<_selected_tool> is loaded and press cycle start to continue.)\n';
+            content += '    M0\n';
+            content += '  o420 endif\n';
+            content += 'o400 else\n';
+            content += '  ; Tool out of magazine range. Load manually\n';
+            content += '  G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '  (' + config.printCmd + ', Tool #<_selected_tool> is out of magazine range. Manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '  M0\n';
+            content += '  (' + config.printCmd + ', Loaded tool out of range)\n';
+            content += 'o400 endif\n\n';
+            
+            content += '; Update the current tool.\n';
+            content += 'M61 Q[#<_selected_tool>]\n';
+            content += 'G4 P0\n';
+            content += '(' + config.printCmd + ', Loaded tool #<_current_tool>)\n';
+            content += '; *************** END LOAD *****************\n\n';
+            
+            return content;
+        }
+
+        // Generate measure logic
+        function generateMeasureLogic(formData, config) {
+            let content = '';
+            
+            content += '; ************* BEGIN MEASURE **************\n';
+            content += 'o600 if [#<_current_tool> EQ 0]\n';
+            content += '  ; We selected tool 0. Do nothing.\n';
+            content += 'o600 elseif [#<_rc_measure> EQ 1]\n';
+            content += '  ; Tool measure is enabled and we have a tool.\n';
+            content += '  ; Remove any G43.1 Z offset\n';
+            content += '  G43.1 Z0\n';
+            content += '  (' + config.printCmd + ', G43.1 Z offset removed)\n';
+            content += '  o610 if [#5220 EQ 1]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5223]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G54: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 2]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5243]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G55: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 3]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5263]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G56: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 4]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5283]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G57: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 5]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5303]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G58: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 6]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5323]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 7]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5343]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.1: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 8]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5363]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.2: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 9]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5383]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.3: #<_rc_z_offset>)\n';
+            content += '  o610 endif\n\n';
+            
+            content += '  G53 G90 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Move to Z safe)\n';
+            content += '  G53 G0 X[#<_rc_measure_x>] Y[#<_rc_measure_y>]\n';
+            content += '  (' + config.printCmd + ', Move to tool setter XY)\n';
+            content += '  G53 G0 Z[#<_rc_measure_start_z>]\n';
+            content += '  (' + config.printCmd + ', Down to Z seek start)\n';
+            content += '  G38.2 G91 Z[#<_rc_seek_dist> * -1] F[#<_rc_seek_feed>]\n';
+            content += '  (' + config.printCmd + ', Probe Z down seek mode)\n';
+            content += '  G0 G91 Z[#<_rc_retract_dist>]\n';
+            content += '  (' + config.printCmd + ', Retract from tool setter)\n';
+            content += '  G38.2 G91 Z[#<_rc_set_distance> * -1]\n';
+            content += '  (' + config.printCmd + ', Probe Z down set mode)\n';
+            content += '  G53 G0 G90 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Triggered Work Z: #5063)\n\n';
+            
+            content += '  #<_rc_trigger_mach_z> = [#5063 + #<_rc_z_offset>]\n';
+            content += '  (' + config.printCmd + ', Triggered Mach Z: #<_rc_trigger_mach_z>)\n';
+            content += '  G4 P0\n\n';
+            
+            content += '  o620 if [#<_rc_tlo_ref> EQ 0]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: 0, Work Z before G43.1: #<_z>)\n';
+            content += '    G43.1 Z[#<_rc_trigger_mach_z>]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: 0, Work Z after G43.1: #<_z>)\n';
+            content += '  o620 else\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: #<_rc_tlo_ref>, Work Z before G43.1: #<_z>)\n';
+            content += '    G43.1 Z[#<_rc_tlo_ref> - #<_rc_trigger_mach_z>]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: #<_rc_tlo_ref>, Work Z after G43.1: #<_z>)\n';
+            content += '  o620 endif\n';
+            content += '  $TLR\n';
+            content += '  (' + config.printCmd + ', TLR set)\n';
+            content += 'o600 else\n';
+            content += '  ; Tool measure is disabled\n';
+            content += '  (' + config.printCmd + ', Tool measurement disabled)\n';
+            content += '  G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Moved to safe clearance)\n';
+            content += 'o600 endif\n';
+            content += '; ************* END MEASURE ****************\n\n';
+            
+            return content;
+        }
+
+        // Generate teardown logic
+        function generateTeardownLogic(formData, config) {
+            let content = '';
+            
+            content += '; ************ BEGIN TEARDOWN **************\n';
+            content += '; Close the dust cover if enabled.\n';
+            content += 'o550 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the closed position.\n';
+            content += '  o560 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_c_pos>]\n';
+            content += '  o560 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_c_pos>]\n';
+            content += '  o560 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_c_pos>]\n';
+            content += '  o560 endif\n';
+            content += 'o550 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn off the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M65 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += '  (' + config.printCmd + ', Dwell for cover)\n';
+            content += 'o550 endif\n\n';
+            
+            content += '; Restore units\n';
+            content += 'G[#<_rc_return_units>]\n';
+            content += '(' + config.printCmd + ', Units restored)\n';
+            content += '(' + config.printCmd + ', Tool change complete)\n';
+            content += '; ************* END TEARDOWN ***************\n';
+            
+            return content;
+        }
+
+        // Generate multi-magazine tc.nc (this is much more complex)
+        function generateMultiMagazineTc(formData) {
+            const config = firmwareConfig[formData.firmware];
+            
+            let content = '';
+            
+            // No copyright section - start with validation
+            content += '; ************ BEGIN VALIDATION ************\n';
+            content += 'o50 if [#1001 NE 1]\n';
+            content += '\t(' + config.printCmd + ', RapidChange settings are not initialized.)\n';
+            content += '\t(' + config.printCmd + ', Abort operation and initialize RapidChange settings.)\n';
+
+            if (formData.firmware === 'grblhal') {
+                content += '\t(' + config.printCmd + ', Program has been paused with M0.)\n';
+                content += '\t' + config.errorCmd + '\n';
+            } else {
+                content += '\t' + config.errorCmd + '\n';
+            }
+
+            content += 'o50 endif\n\n';
+
+            content += 'o100 if [#<_selected_tool> LT 0]\n';
+            content += '\t(' + config.printCmd + ', Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)\n';
+
+            if (formData.firmware === 'grblhal') {
+                content += '\t' + config.errorCmd + '\n';
+            } else {
+                content += '\t' + config.errorCmd + '\n';
+            }
+
+            content += 'o100 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
+            content += '\t(' + config.printCmd + ', Current tool selected. Tool change bypassed.)\n';
+
+            if (formData.firmware === 'grblhal') {
+                content += '\tM99\n';
+            }
+
+            content += 'o100 endif\n';
+            content += '(' + config.printCmd + ', Tool change validated)\n';
+            content += '; ************* END VALIDATION *************\n\n';
+
+            // Setup section for multi-magazine based on existing TC.macro structure
+            content += '; ************** BEGIN SETUP ***************\n';
+            content += '; Turn off spindle and coolant\n';
+            content += 'M5\n';
+            content += 'M9\n';
+            content += '(' + config.printCmd + ', Spindle and coolant turned off)\n\n';
+
+            content += '; Record current units\n';
+            content += 'o200 if [#<_metric> EQ 0]\n';
+            content += '  #<_rc_return_units> = 20\n';
+            content += 'o200 else\n';
+            content += '  #<_rc_return_units> = 21\n';
+            content += 'o200 endif\n';
+            content += '(' + config.printCmd + ', Units recorded)\n\n';
+
+            content += '; Activate configured units and absolute distance mode\n';
+            content += 'G[#<_rc_units>] G90\n';
+            content += '(' + config.printCmd + ', Set units and distance)\n\n';
+
+            // Generate dynamic magazine determination logic for multi-magazine
+            content += generateDynamicMagazineDetermination(formData, config);
+
+            // Position calculation logic for all magazines
+            content += generateDynamicMultiMagazinePositionLogic(formData, config);
+
+            content += 'G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '(' + config.printCmd + ', Moved to safe clearance)\n\n';
+
+            // Dust cover opening
+            content += '; Open the dust cover if enabled.\n';
+            content += 'o500 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the open position.\n';
+            content += '  o510 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_o_pos>]\n';
+            content += '  o510 endif\n';
+            content += 'o500 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn on the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M64 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += 'o500 endif\n';
+            content += '; *************** END SETUP ****************\n\n';
+
+            // Unload section
+            content += generateMultiMagazineUnloadLogic(formData, config);
+
+            // Load section  
+            content += generateMultiMagazineLoadLogic(formData, config);
+
+            // Measure section
+            content += generateMeasureLogic(formData, config);
+
+            // Teardown section
+            content += generateTeardownLogic(formData, config);
+
+            return content;
+        }
+
+        // Generate dynamic magazine determination logic for all magazines
+        function generateDynamicMagazineDetermination(formData, config) {
+            let content = '';
+            
+            // Determine current tool magazine
+            content += '; Determine current magazine based on current tool number\n';
+            let totalPockets = 0;
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                const prevTotalPockets = totalPockets;
+                totalPockets += parseInt(mag.pockets);
+                
+                if (i === 0) {
+                    content += `o205 if [#<_current_tool> LE ${totalPockets}]\n`;
+                } else {
+                    content += `o205 elseif [#<_current_tool> GT ${prevTotalPockets} AND #<_current_tool> LE ${totalPockets}]\n`;
+                }
+                content += `  #<_current_magazine> = ${magNum}\n`;
+                content += `  (${config.printCmd}, Current tool in magazine ${magNum})\n`;
+            }
+            content += 'o205 endif\n\n';
+            
+            // Determine selected tool magazine
+            content += '; Determine selected magazine based on selected tool number\n';
+            totalPockets = 0;
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                const prevTotalPockets = totalPockets;
+                totalPockets += parseInt(mag.pockets);
+                
+                if (i === 0) {
+                    content += `o206 if [#<_selected_tool> LE ${totalPockets}]\n`;
+                } else {
+                    content += `o206 elseif [#<_selected_tool> GT ${prevTotalPockets} AND #<_selected_tool> LE ${totalPockets}]\n`;
+                }
+                content += `  #<_selected_magazine> = ${magNum}\n`;
+                content += `  (${config.printCmd}, Selected tool in magazine ${magNum})\n`;
+            }
+            content += 'o206 endif\n\n';
+            
+            return content;
+        }
+
+        // Generate position logic for all magazines dynamically
+        function generateDynamicMultiMagazinePositionLogic(formData, config) {
+            let content = '';
+            
+            // Current tool position logic
+            content += '; Set pocket locations based on selected and current magazines\n';
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                
+                if (i === 0) {
+                    content += `o210 if [#<_current_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                } else {
+                    content += `o210 elseif [#<_current_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                }
+                
+                content += `  o21${magNum} if [#<_rc${magNum}_alignment> EQ 0]\n`;
+                
+                if (i === 0) {
+                    // First magazine uses direct tool number
+                    content += `    #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_x>]\n`;
+                } else {
+                    // Other magazines need to subtract cumulative pocket count from previous magazines
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_x_unload> = [#<_temp4> + #<_rc${magNum}_pocket_one_x>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Unload X set to #<_rc_x_unload> for magazine ${magNum})\n`;
+                content += `    #<_rc_y_unload> = #<_rc${magNum}_pocket_one_y>\n`;
+                content += `    (${config.printCmd}, Unload Y set to #<_rc_y_unload> for magazine ${magNum})\n`;
+                content += `  o21${magNum} else\n`;
+                content += `    #<_rc_x_unload> = #<_rc${magNum}_pocket_one_x>\n`;
+                content += `    (${config.printCmd}, Unload X set to #<_rc_x_unload> for magazine ${magNum})\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_y>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_y_unload> = [#<_temp4> + #<_rc${magNum}_pocket_one_y>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Unload Y set to #<_rc_y_unload> for magazine ${magNum}, Y alignment)\n`;
+                content += `  o21${magNum} endif\n`;
+            }
+            content += 'o210 endif\n\n';
+
+            // Selected tool position logic  
+            content += '; Load settings based on selected magazine\n';
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                
+                if (i === 0) {
+                    content += `o213 if [#<_selected_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                } else {
+                    content += `o213 elseif [#<_selected_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                }
+                
+                content += `  o21${magNum + 10} if [#<_rc${magNum}_alignment> EQ 0]\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_x>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_x_load> = [#<_temp4> + #<_rc${magNum}_pocket_one_x>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Load X set to #<_rc_x_load> for magazine ${magNum})\n`;
+                content += `    #<_rc_y_load> = #<_rc${magNum}_pocket_one_y>\n`;
+                content += `    (${config.printCmd}, Load Y set to #<_rc_y_load> for magazine ${magNum})\n`;
+                content += `  o21${magNum + 10} else\n`;
+                content += `    #<_rc_x_load> = #<_rc${magNum}_pocket_one_x>\n`;
+                content += `    (${config.printCmd}, Load X set to #<_rc_x_load> for magazine ${magNum})\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_y>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_y_load> = [#<_temp4> + #<_rc${magNum}_pocket_one_y>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Load Y set to #<_rc_y_load> for magazine ${magNum}, Y alignment)\n`;
+                content += `  o21${magNum + 10} endif\n`;
+            }
+            content += 'o213 endif\n\n';
+
+            return content;
+        }
+
+        // Generate position logic for multi-magazine
+        function generateMultiMagazinePositionLogic(formData, config) {
+            let content = '';
+            
+            // Current tool position logic
+            content += '; Set pocket locations based on selected and current magazines\n';
+            content += 'o210 if [#<_current_magazine> EQ 1]  ; Primary magazine setup\n';
+            content += '  o211 if [#<_rc1_alignment> EQ 0]\n';
+            content += '    #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for primary magazine)\n';
+            content += '    #<_rc_y_unload> = #<_rc1_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for primary magazine)\n';
+            content += '  o211 else\n';
+            content += '    #<_rc_x_unload> = #<_rc1_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for primary magazine)\n';
+            content += '    #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for primary magazine, Y alignment)\n';
+            content += '  o211 endif\n';
+            content += 'o210 else  ; Secondary magazine setup\n';
+            content += '  o212 if [#<_rc2_alignment> EQ 0]\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_current_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_x_unload> = [#<_temp4> + #<_rc2_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for secondary magazine)\n';
+            content += '    #<_rc_y_unload> = #<_rc2_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for secondary magazine)\n';
+            content += '  o212 else\n';
+            content += '    #<_rc_x_unload> = #<_rc2_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for secondary magazine)\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_current_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_y_unload> = [#<_temp4> + #<_rc2_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for secondary magazine, Y alignment)\n';
+            content += '  o212 endif\n';
+            content += 'o210 endif\n\n';
+
+            // Selected tool position logic  
+            content += '; Load settings based on selected magazine\n';
+            content += 'o213 if [#<_selected_magazine> EQ 1]  ; Primary magazine setup\n';
+            content += '  o214 if [#<_rc1_alignment> EQ 0]\n';
+            content += '    #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for primary magazine)\n';
+            content += '    #<_rc_y_load> = #<_rc1_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for primary magazine)\n';
+            content += '  o214 else\n';
+            content += '    #<_rc_x_load> = #<_rc1_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for primary magazine)\n';
+            content += '    #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for primary magazine, Y alignment)\n';
+            content += '  o214 endif\n';
+            content += 'o213 else  ; Secondary magazine setup\n';
+            content += '  o215 if [#<_rc2_alignment> EQ 0]\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_x_load> = [#<_temp4> + #<_rc2_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for secondary magazine)\n';
+            content += '    #<_rc_y_load> = #<_rc2_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for secondary magazine)\n';
+            content += '  o215 else\n';
+            content += '    #<_rc_x_load> = #<_rc2_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for secondary magazine)\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_y_load> = [#<_temp4> + #<_rc2_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for secondary magazine, Y alignment)\n';
+            content += '  o215 endif\n';
+            content += 'o213 endif\n\n';
+
+            return content;
+        }
         function generateMagazineDeterminationLogic(formData, toolVar, operation) {
             let content = '';
             let totalPockets = 0;
