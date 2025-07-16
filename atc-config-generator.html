@@ -842,14 +842,18 @@
             if (downloadInitBtn) {
                 downloadInitBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    downloadFile(generatedFiles.init, 'init.nc');
+                    const firmware = document.getElementById('firmware').value;
+                    const config = firmwareConfig[firmware];
+                    downloadFile(generatedFiles.init, config.initName + config.initExt);
                 });
             }
             
             if (downloadTcBtn) {
                 downloadTcBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    downloadFile(generatedFiles.tc, 'tc.nc');
+                    const firmware = document.getElementById('firmware').value;
+                    const config = firmwareConfig[firmware];
+                    downloadFile(generatedFiles.tc, config.tcName + config.tcExt);
                 });
             }
         }
@@ -974,31 +978,7 @@
             const config = firmwareConfig[formData.firmware];
             let content = '';
             
-            // Add grblHAL copyright header if needed
-            if (formData.firmware === 'grblhal') {
-                content += `; 
-; Copyright (C) 2024 Greilick Industries LLC
-
-; RapidChange ATC Macros for GrblHAL is free software:
-; You can redistribute it and/or modify it under the terms
-; of the GNU General Public License as published by
-; the Free Software Foundation, under version 3 of the License.
-
-; RapidChange ATC Macros for GrblHAL is distributed in the
-; hope that it will be useful, but WITHOUT ANY WARRANTY
-; without even the implied warranty of MERCHANTABILITY or
-; FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-; License for more details.
-
-; You should have received a copy of the GNU General Public License
-; along with RapidChange ATC Macros for GrblHAL.  
-; If not, see <https://www.gnu.org/licenses/>.
-; 
-
-`;
-            }
-            
-            // Header comment
+            // Header comment - no copyright section
             content += '; ******** BEGIN USER CONFIGURATION ********\n';
             content += '; ATC Operations\n';
             content += '; The units for your configuration: 20 = Inches, 21 = Millimeters\n';
@@ -1037,12 +1017,15 @@
                     
                     content += `; The number of pockets in your ${getOrdinal(magNum)} magazine.\n`;
                     content += `#<_rc${magNum}_pockets> = ${mag.pockets}\n`;
-                    content += `(print,Pockets: #<_rc${magNum}_pockets>)\n\n`;
+                    content += `(` + config.printCmd + `,Pockets: #<_rc${magNum}_pockets>)\n\n`;
                 }
                 
                 content += '; The pocket offset for your magazines.\n';
-                content += `#<_rc_pocket_offset> = ${formData.pocketOffset}\n`;
-                content += '(' + config.printCmd + ',Pocket Offset: #<_rc_pocket_offset>)\n\n';
+                for (let i = 0; i < formData.magazineCount; i++) {
+                    const magNum = i + 1;
+                    content += `#<_rc${magNum}_pocket_offset> = ${formData.pocketOffset}\n`;
+                    content += '(' + config.printCmd + `,Pocket Offset: #<_rc${magNum}_pocket_offset>)\n\n`;
+                }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
                     const mag = formData.magazines[i];
@@ -1050,7 +1033,7 @@
                     
                     content += `; The axis along which the ${getOrdinal(magNum)} magazine is aligned: 0 = X Axis, 1 = Y Axis.\n`;
                     content += `#<_rc${magNum}_alignment> = ${mag.alignment}\n`;
-                    content += `(print,Alignment: #<_rc${magNum}_alignment>)\n\n`;
+                    content += `(` + config.printCmd + `,Alignment: #<_rc${magNum}_alignment>)\n\n`;
                 }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
@@ -1059,7 +1042,7 @@
                     
                     content += `; The direction of travel from pocket 1 to pocket 2 for the ${getOrdinal(magNum)} magazine: 1 = Positive, -1 = Negative.\n`;
                     content += `#<_rc${magNum}_direction> = ${mag.direction}\n`;
-                    content += `(print,Direction: #<_rc${magNum}_direction>)\n\n`;
+                    content += `(` + config.printCmd + `,Direction: #<_rc${magNum}_direction>)\n\n`;
                 }
                 
                 for (let i = 0; i < formData.magazineCount; i++) {
@@ -1068,9 +1051,9 @@
                     
                     content += `; The X an Y machine coordinate positions of pocket 1 of the ${getOrdinal(magNum)} magazine.\n`;
                     content += `#<_rc${magNum}_pckt_one_x> = ${mag.pocketOneX}\n`;
-                    content += `(print,Pocket 1 X: #<_rc${magNum}_pckt_one_x>)\n\n`;
+                    content += `(` + config.printCmd + `,Pocket 1 X: #<_rc${magNum}_pckt_one_x>)\n\n`;
                     content += `#<_rc${magNum}_pckt_one_y> = ${mag.pocketOneY}\n`;
-                    content += `(print,Pocket 1 Y: #<_rc${magNum}_pckt_one_y>)\n\n`;
+                    content += `(` + config.printCmd + `,Pocket 1 Y: #<_rc${magNum}_pckt_one_y>)\n\n`;
                 }
             }
 
@@ -1254,30 +1237,7 @@
             
             let content = '';
             
-            // Add grblHAL copyright header if needed
-            if (formData.firmware === 'grblhal') {
-                content += `; 
-; Copyright (C) 2024 Greilick Industries LLC
-
-; RapidChange ATC Macros for GrblHAL is free software:
-; You can redistribute it and/or modify it under the terms
-; of the GNU General Public License as published by
-; the Free Software Foundation, under version 3 of the License.
-
-; RapidChange ATC Macros for GrblHAL is distributed in the
-; hope that it will be useful, but WITHOUT ANY WARRANTY
-; without even the implied warranty of MERCHANTABILITY or
-; FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-; License for more details.
-
-; You should have received a copy of the GNU General Public License
-; along with RapidChange ATC Macros for GrblHAL.  
-; If not, see <https://www.gnu.org/licenses/>.
-;
-
-`;
-            }
-            
+            // No copyright section - start with validation
             content += '; ************ BEGIN VALIDATION ************\n';
             content += 'o50 if [#1001 NE 1]\n';
             content += '\t(' + config.printCmd + ', RapidChange settings are not initialized.)\n';
@@ -1290,7 +1250,9 @@
                 content += '\t' + config.errorCmd + '\n';
             }
 
-            content += 'o50 elseif [#<_selected_tool> LT 0]\n';
+            content += 'o50 endif\n\n';
+
+            content += 'o100 if [#<_selected_tool> LT 0]\n';
             content += '\t(' + config.printCmd + ', Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)\n';
 
             if (formData.firmware === 'grblhal') {
@@ -1299,23 +1261,437 @@
                 content += '\t' + config.errorCmd + '\n';
             }
 
-            content += 'o50 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
+            content += 'o100 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
             content += '\t(' + config.printCmd + ', Current tool selected. Tool change bypassed.)\n';
 
             if (formData.firmware === 'grblhal') {
                 content += '\tM99\n';
             }
 
-            content += 'o50 else\n';
-            content += '\t(' + config.printCmd + ', Tool change validated)\n';
-            content += '\t; ************* END VALIDATION *************\n\n';
+            content += 'o100 endif\n';
+            content += '(' + config.printCmd + ', Tool change validated)\n';
+            content += '; ************* END VALIDATION *************\n\n';
 
-            // For now, let's return a basic TC file with just the validation
-            // The rest would be very long to implement properly here
-            content += '\t; Tool change logic would go here\n';
-            content += '\t; (This is a simplified version)\n\n';
-            content += 'o50 endif\n';
+            // Setup section
+            content += '; ************** BEGIN SETUP ***************\n';
+            content += '; Turn off spindle and coolant\n';
+            content += 'M5\n';
+            content += 'M9\n';
+            content += '(' + config.printCmd + ', Spindle and coolant turned off)\n\n';
 
+            content += '; Record current units\n';
+            content += 'o200 if [#<_metric> EQ 0]\n';
+            content += '  #<_rc_return_units> = 20\n';
+            content += 'o200 else\n';
+            content += '  #<_rc_return_units> = 21\n';
+            content += 'o200 endif\n';
+            content += '(' + config.printCmd + ', Units recorded)\n\n';
+
+            content += '; Activate configured units and absolute distance mode\n';
+            content += 'G[#<_rc_units>] G90\n';
+            content += '(' + config.printCmd + ', Set units and distance)\n\n';
+
+            // Pocket calculations for single magazine
+            content += '; Set pocket locations\n';
+            content += 'o210 if [#<_rc_alignment> EQ 0]\n';
+            content += '  #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
+            content += '  (' + config.printCmd + ', Unload X set to #<_rc_x_unload>)\n';
+            content += '  #<_rc_y_unload> = #<_rc_pocket_one_y>\n';
+            content += '  (' + config.printCmd + ', Unload Y set to #<_rc_y_unload>)\n';
+            content += 'o210 else\n';
+            content += '  #<_rc_x_unload> = #<_rc_pocket_one_x>\n';
+            content += '  (' + config.printCmd + ', Unload X set to #<_rc_x_unload>)\n';
+            content += '  #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
+            content += '  (' + config.printCmd + ', Unload Y set to #<_rc_y_unload>, Y alignment)\n';
+            content += 'o210 endif\n\n';
+
+            content += 'o220 if [#<_rc_alignment> EQ 0]\n';
+            content += '  #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_x>]\n';
+            content += '  (' + config.printCmd + ', Load X set to #<_rc_x_load>)\n';
+            content += '  #<_rc_y_load> = #<_rc_pocket_one_y>\n';
+            content += '  (' + config.printCmd + ', Load Y set to #<_rc_y_load>)\n';
+            content += 'o220 else\n';
+            content += '  #<_rc_x_load> = #<_rc_pocket_one_x>\n';
+            content += '  (' + config.printCmd + ', Load X set to #<_rc_x_load>)\n';
+            content += '  #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc_pocket_offset> * #<_rc_direction>] + #<_rc_pocket_one_y>]\n';
+            content += '  (' + config.printCmd + ', Load Y set to #<_rc_y_load>, Y alignment)\n';
+            content += 'o220 endif\n\n';
+
+            content += 'G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '(' + config.printCmd + ', Moved to safe clearance)\n\n';
+
+            // Dust cover opening
+            content += '; Open the dust cover if enabled.\n';
+            content += 'o500 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the open position.\n';
+            content += '  o510 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_o_pos>]\n';
+            content += '  o510 endif\n';
+            content += 'o500 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn on the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M64 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += 'o500 endif\n';
+            content += '; *************** END SETUP ****************\n\n';
+
+            // Unload section
+            content += generateSingleMagazineUnloadLogic(formData, config);
+
+            // Load section
+            content += generateSingleMagazineLoadLogic(formData, config);
+
+            // Measure section
+            content += generateMeasureLogic(formData, config);
+
+            // Teardown section
+            content += generateTeardownLogic(formData, config);
+
+            return content;
+        }
+
+        // Generate single magazine unload logic
+        function generateSingleMagazineUnloadLogic(formData, config) {
+            const mag = formData.magazines[0];
+            let content = '';
+            
+            content += '; ************** BEGIN UNLOAD **************\n';
+            content += '; Unload current tool\n';
+            content += 'o300 if [#<_current_tool> EQ 0]\n';
+            content += '  ; We have tool 0. Do nothing as we are already unloaded.\n';
+            content += '  (' + config.printCmd + ', Unloaded tool 0)\n';
+            if (formData.firmware === 'grblhal') {
+                content += '  M99\n';
+            }
+            content += 'o300 elseif [#<_current_tool> GT #<_rc_pockets>]\n';
+            content += '  ; Tool out of magazine range. Unload manually\n';
+            content += '  G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '  (' + config.printCmd + ', Tool #<_current_tool> is out of magazine range. Manually remove tool #<_current_tool> and cycle start to continue.)\n';
+            content += '  M0\n';
+            content += '  (' + config.printCmd + ', Unloaded tool out of range)\n';
+            content += 'o300 else\n';
+            content += '  ; We have a tool with a pocket\n';
+            content += '  G53 G0 X[#<_rc_x_unload>] Y[#<_rc_y_unload>]\n';
+            content += '  (' + config.printCmd + ', Move to pocket #<_current_tool>)\n';
+            content += '  G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '  (' + config.printCmd + ', Move to spin start)\n';
+            content += '  M4 S[#<_rc_unload_rpm>]\n';
+            content += '  (' + config.printCmd + ', Run spindle CCW)\n';
+            content += '  G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '  (' + config.printCmd + ', Engage)\n';
+            content += '  G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '  (' + config.printCmd + ', Retreat)\n\n';
+            
+            content += '  ; Confirm tool unloaded\n';
+            content += '  o310 if [#<_rc_recognize> EQ 1]\n';
+            content += '    G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '    (' + config.printCmd + ', Move to zone 1)\n';
+            content += '    G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '    M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o320 if [#5399 EQ -1]\n';
+            } else {
+                content += '    M66 P[#<_rc_rec_input>] L0\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o320 if [#5399 EQ 1]\n';
+            }
+            
+            content += '      (' + config.printCmd + ', Input read timed out)\n';
+            content += '      G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '      (' + config.printCmd + ', Go to spindle start)\n';
+            content += '      G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '      (' + config.printCmd + ', Engage)\n';
+            content += '      G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '      (' + config.printCmd + ', Retreat)\n';
+            content += '      M5\n';
+            content += '      G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '      (' + config.printCmd + ', Move to zone 1)\n';
+            content += '      G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '      M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '      (' + config.printCmd + ', Input read again: #5399)\n';
+                content += '      o330 if [#5399 EQ -1]\n';
+            } else {
+                content += '      M66 P[#<_rc_rec_input>] L0\n';
+                content += '      (' + config.printCmd + ', Input read again: #5399)\n';
+                content += '      o330 if [#5399 EQ 1]\n';
+            }
+            
+            content += '        (' + config.printCmd + ', Input read timed out again)\n';
+            content += '        G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '        (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '        G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '        (' + config.printCmd + ', Go to manual position)\n';
+            content += '        (' + config.printCmd + ', Tool #<_current_tool> failed to unload. Please manually unload tool #<_current_tool> and cycle start to continue.)\n';
+            content += '        M0\n';
+            content += '      o330 else\n';
+            content += '        G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to load)\n';
+            content += '      o330 endif\n';
+            content += '    o320 else\n';
+            content += '      M5\n';
+            content += '      G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '      (' + config.printCmd + ', Go to move to load)\n';
+            content += '    o320 endif\n';
+            content += '  o310 else\n';
+            content += '    M5\n';
+            content += '    (' + config.printCmd + ', Stop spindle)\n';
+            content += '    G53 G0 Z[#<_rc_to_load_z>]\n';
+            content += '    (' + config.printCmd + ', Go to move to load)\n';
+            content += '    (' + config.printCmd + ', Confirm tool #<_current_tool> is unloaded and press cycle start to continue.)\n';
+            content += '    M0\n';
+            content += '  o310 endif\n';
+            content += 'o300 endif\n';
+            content += '; *************** END UNLOAD ***************\n\n';
+            
+            return content;
+        }
+
+        // Generate single magazine load logic
+        function generateSingleMagazineLoadLogic(formData, config) {
+            let content = '';
+            
+            content += '; *************** BEGIN LOAD ***************\n';
+            content += 'o400 if [#<_selected_tool> EQ 0]\n';
+            content += '  ; We selected tool 0.\n';
+            content += '  ; Go to safe z.\n';
+            content += '  G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Moved to safe clearance)\n';
+            content += '  ; reset TLO to 0\n';
+            content += '  G43.1 Z0\n';
+            content += '  (' + config.printCmd + ', G43.1 Z offset removed)\n';
+            content += '  M61 Q0\n';
+            content += '  #<_rc_tool1_offset> = 0\n';
+            content += '  #<_rc_tool1_offset_referenced> = 0\n';
+            content += 'o400 elseif [#<_selected_tool> LE #<_rc_pockets>]\n';
+            content += '  ; We have a tool with a pocket\n';
+            content += '  G53 G0 X[#<_rc_x_load>] Y[#<_rc_y_load>]\n';
+            content += '  (' + config.printCmd + ', Move to pocket #<_selected_tool>)\n';
+            content += '  G53 G0 Z[#<_rc_engage_z> + #<_rc_z_spin_off>]\n';
+            content += '  (' + config.printCmd + ', Move to spin start)\n';
+            content += '  G53 G1 Z[#<_rc_load_spin_z>] F[#<_rc_engage_feed>]\n';
+            content += '  M3 S[#<_rc_load_rpm>]\n';
+            content += '  (' + config.printCmd + ', Run spindle CW)\n\n';
+            
+            content += '  #<_rc_times_plunged> = 0\n';
+            content += '  o410 while [#<_rc_times_plunged> LT #<_rc_plunge_count>]\n';
+            content += '    G53 G1 Z[#<_rc_engage_z>] F[#<_rc_engage_feed>]\n';
+            content += '    (' + config.printCmd + ', Engage)\n';
+            content += '    G53 G1 Z[#<_rc_engage_z> + #<_rc_z_retreat_off>] F[#<_rc_engage_feed>]\n';
+            content += '    (' + config.printCmd + ', Retreat)\n';
+            content += '    #<_rc_times_plunged> = [#<_rc_times_plunged> + 1]\n';
+            content += '    (' + config.printCmd + ', Load plunge #<_rc_times_plunged> complete)\n';
+            content += '  o410 endwhile\n\n';
+            
+            content += '  M5\n';
+            content += '  (' + config.printCmd + ', Stop spindle)\n\n';
+            
+            content += '  ; Confirm Load\n';
+            content += '  o420 if [#<_rc_recognize> EQ 1]\n';
+            content += '    (' + config.printCmd + ', Tool Recognition Enabled)\n';
+            content += '    G53 G0 Z[#<_rc_zone_one_z>]\n';
+            content += '    (' + config.printCmd + ', Move to zone 1)\n';
+            content += '    G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '    M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o430 if [#5399 NE -1]\n';
+                content += '      (' + config.printCmd + ', Failed Zone 1)\n';
+            } else {
+                content += '    M66 P[#<_rc_rec_input>] L0\n';
+                content += '    (' + config.printCmd + ', Read input: #5399)\n\n';
+                content += '    o430 if [#5399 EQ 0]\n';
+                content += '      (' + config.printCmd + ', Input read successfully)\n';
+            }
+            
+            content += '      G53 G0 Z[#<_rc_zone_two_z>]\n';
+            content += '      (' + config.printCmd + ', Move to zone 2)\n';
+            content += '      G4 P0\n';
+            
+            if (formData.firmware === 'grblhal') {
+                content += '      M66 P[#<_rc_rec_input>] L3 Q0.2\n';
+                content += '      (' + config.printCmd + ', Read input: #5399)\n';
+                content += '      o440 if [#5399 EQ -1]\n';
+            } else {
+                content += '      M66 P[#<_rc_rec_input>] L0\n';
+                content += '      (' + config.printCmd + ', Read input: #5399)\n';
+                content += '      o440 if [#5399 EQ 1]\n';
+            }
+            
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> loaded successfully)\n';
+            content += '        M61 Q[#<_selected_tool>]\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> selected)\n';
+            content += '        G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to measure)\n';
+            content += '      o440 else\n';
+            content += '        (' + config.printCmd + ', Zone 2 tool recognition failed)\n';
+            content += '        G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '        (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '        G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '        (' + config.printCmd + ', Go to manual position)\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '        M0\n';
+            content += '        M61 Q[#<_selected_tool>]\n';
+            content += '        (' + config.printCmd + ', Tool #<_selected_tool> manually loaded)\n';
+            content += '        G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '        (' + config.printCmd + ', Go to move to measure)\n';
+            content += '      o440 endif\n';
+            content += '    o430 else\n';
+            content += '      (' + config.printCmd + ', Zone 1 tool recognition failed)\n';
+            content += '      G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '      (' + config.printCmd + ', Go to safe clearance)\n';
+            content += '      G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '      (' + config.printCmd + ', Go to manual position)\n';
+            content += '      (' + config.printCmd + ', Tool #<_selected_tool> failed to load. Please manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '      M0\n';
+            content += '      M61 Q[#<_selected_tool>]\n';
+            content += '      (' + config.printCmd + ', Tool #<_selected_tool> manually loaded)\n';
+            content += '      G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '      (' + config.printCmd + ', Go to move to measure)\n';
+            content += '    o430 endif\n';
+            content += '  o420 else\n';
+            content += '    (' + config.printCmd + ', Tool recognition disabled)\n';
+            content += '    G53 G0 Z[#<_rc_to_measure_z>]\n';
+            content += '    (' + config.printCmd + ', Move to measure z)\n';
+            content += '    (' + config.printCmd + ', Confirm tool #<_selected_tool> is loaded and press cycle start to continue.)\n';
+            content += '    M0\n';
+            content += '  o420 endif\n';
+            content += 'o400 else\n';
+            content += '  ; Tool out of magazine range. Load manually\n';
+            content += '  G53 G0 X[#<_rc_manual_x>] Y[#<_rc_manual_y>]\n';
+            content += '  (' + config.printCmd + ', Tool #<_selected_tool> is out of magazine range. Manually load tool #<_selected_tool> and cycle start to continue.)\n';
+            content += '  M0\n';
+            content += '  (' + config.printCmd + ', Loaded tool out of range)\n';
+            content += 'o400 endif\n\n';
+            
+            content += '; Update the current tool.\n';
+            content += 'M61 Q[#<_selected_tool>]\n';
+            content += 'G4 P0\n';
+            content += '(' + config.printCmd + ', Loaded tool #<_current_tool>)\n';
+            content += '; *************** END LOAD *****************\n\n';
+            
+            return content;
+        }
+
+        // Generate measure logic
+        function generateMeasureLogic(formData, config) {
+            let content = '';
+            
+            content += '; ************* BEGIN MEASURE **************\n';
+            content += 'o600 if [#<_current_tool> EQ 0]\n';
+            content += '  ; We selected tool 0. Do nothing.\n';
+            content += 'o600 elseif [#<_rc_measure> EQ 1]\n';
+            content += '  ; Tool measure is enabled and we have a tool.\n';
+            content += '  ; Remove any G43.1 Z offset\n';
+            content += '  G43.1 Z0\n';
+            content += '  (' + config.printCmd + ', G43.1 Z offset removed)\n';
+            content += '  o610 if [#5220 EQ 1]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5223]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G54: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 2]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5243]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G55: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 3]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5263]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G56: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 4]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5283]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G57: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 5]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5303]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G58: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 6]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5323]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 7]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5343]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.1: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 8]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5363]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.2: #<_rc_z_offset>)\n';
+            content += '  o610 elseif [#5220 EQ 9]\n';
+            content += '    #<_rc_z_offset> = [#5213 + #5383]\n';
+            content += '    (' + config.printCmd + ', Z Offset Calculated in G59.3: #<_rc_z_offset>)\n';
+            content += '  o610 endif\n\n';
+            
+            content += '  G53 G90 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Move to Z safe)\n';
+            content += '  G53 G0 X[#<_rc_measure_x>] Y[#<_rc_measure_y>]\n';
+            content += '  (' + config.printCmd + ', Move to tool setter XY)\n';
+            content += '  G53 G0 Z[#<_rc_measure_start_z>]\n';
+            content += '  (' + config.printCmd + ', Down to Z seek start)\n';
+            content += '  G38.2 G91 Z[#<_rc_seek_dist> * -1] F[#<_rc_seek_feed>]\n';
+            content += '  (' + config.printCmd + ', Probe Z down seek mode)\n';
+            content += '  G0 G91 Z[#<_rc_retract_dist>]\n';
+            content += '  (' + config.printCmd + ', Retract from tool setter)\n';
+            content += '  G38.2 G91 Z[#<_rc_set_distance> * -1]\n';
+            content += '  (' + config.printCmd + ', Probe Z down set mode)\n';
+            content += '  G53 G0 G90 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Triggered Work Z: #5063)\n\n';
+            
+            content += '  #<_rc_trigger_mach_z> = [#5063 + #<_rc_z_offset>]\n';
+            content += '  (' + config.printCmd + ', Triggered Mach Z: #<_rc_trigger_mach_z>)\n';
+            content += '  G4 P0\n\n';
+            
+            content += '  o620 if [#<_rc_tlo_ref> EQ 0]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: 0, Work Z before G43.1: #<_z>)\n';
+            content += '    G43.1 Z[#<_rc_trigger_mach_z>]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: 0, Work Z after G43.1: #<_z>)\n';
+            content += '  o620 else\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: #<_rc_tlo_ref>, Work Z before G43.1: #<_z>)\n';
+            content += '    G43.1 Z[#<_rc_tlo_ref> - #<_rc_trigger_mach_z>]\n';
+            content += '    (' + config.printCmd + ', Ref Mach Pos: #<_rc_tlo_ref>, Work Z after G43.1: #<_z>)\n';
+            content += '  o620 endif\n';
+            content += '  $TLR\n';
+            content += '  (' + config.printCmd + ', TLR set)\n';
+            content += 'o600 else\n';
+            content += '  ; Tool measure is disabled\n';
+            content += '  (' + config.printCmd + ', Tool measurement disabled)\n';
+            content += '  G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '  (' + config.printCmd + ', Moved to safe clearance)\n';
+            content += 'o600 endif\n';
+            content += '; ************* END MEASURE ****************\n\n';
+            
+            return content;
+        }
+
+        // Generate teardown logic
+        function generateTeardownLogic(formData, config) {
+            let content = '';
+            
+            content += '; ************ BEGIN TEARDOWN **************\n';
+            content += '; Close the dust cover if enabled.\n';
+            content += 'o550 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the closed position.\n';
+            content += '  o560 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_c_pos>]\n';
+            content += '  o560 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_c_pos>]\n';
+            content += '  o560 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_c_pos>]\n';
+            content += '  o560 endif\n';
+            content += 'o550 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn off the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M65 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += '  (' + config.printCmd + ', Dwell for cover)\n';
+            content += 'o550 endif\n\n';
+            
+            content += '; Restore units\n';
+            content += 'G[#<_rc_return_units>]\n';
+            content += '(' + config.printCmd + ', Units restored)\n';
+            content += '(' + config.printCmd + ', Tool change complete)\n';
+            content += '; ************* END TEARDOWN ***************\n';
+            
             return content;
         }
 
@@ -1325,30 +1701,7 @@
             
             let content = '';
             
-            // Add grblHAL copyright header if needed
-            if (formData.firmware === 'grblhal') {
-                content += `; 
-; Copyright (C) 2024 Greilick Industries LLC
-
-; RapidChange ATC Macros for GrblHAL is free software:
-; You can redistribute it and/or modify it under the terms
-; of the GNU General Public License as published by
-; the Free Software Foundation, under version 3 of the License.
-
-; RapidChange ATC Macros for GrblHAL is distributed in the
-; hope that it will be useful, but WITHOUT ANY WARRANTY
-; without even the implied warranty of MERCHANTABILITY or
-; FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-; License for more details.
-
-; You should have received a copy of the GNU General Public License
-; along with RapidChange ATC Macros for GrblHAL.  
-; If not, see <https://www.gnu.org/licenses/>.
-;
-
-`;
-            }
-            
+            // No copyright section - start with validation
             content += '; ************ BEGIN VALIDATION ************\n';
             content += 'o50 if [#1001 NE 1]\n';
             content += '\t(' + config.printCmd + ', RapidChange settings are not initialized.)\n';
@@ -1361,7 +1714,9 @@
                 content += '\t' + config.errorCmd + '\n';
             }
 
-            content += 'o50 elseif [#<_selected_tool> LT 0]\n';
+            content += 'o50 endif\n\n';
+
+            content += 'o100 if [#<_selected_tool> LT 0]\n';
             content += '\t(' + config.printCmd + ', Selected Tool: #<_selected_tool> is out of range. Tool change aborted. Program paused.)\n';
 
             if (formData.firmware === 'grblhal') {
@@ -1370,29 +1725,173 @@
                 content += '\t' + config.errorCmd + '\n';
             }
 
-            content += 'o50 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
+            content += 'o100 elseif [#<_selected_tool> EQ #<_current_tool>]\n';
             content += '\t(' + config.printCmd + ', Current tool selected. Tool change bypassed.)\n';
 
             if (formData.firmware === 'grblhal') {
                 content += '\tM99\n';
             }
 
-            content += 'o50 else\n';
-            content += '\t(' + config.printCmd + ', Tool change validated)\n';
-            content += '\t; ************* END VALIDATION *************\n\n';
+            content += 'o100 endif\n';
+            content += '(' + config.printCmd + ', Tool change validated)\n';
+            content += '; ************* END VALIDATION *************\n\n';
 
-            // For now, let's return a basic TC file with just the validation
-            // The multi-magazine logic would be very complex to implement properly here
-            content += '\t; Multi-magazine tool change logic would go here\n';
-            content += '\t; (This is a simplified version)\n\n';
-            content += 'o50 endif\n';
+            // Setup section for multi-magazine based on existing TC.macro structure
+            content += '; ************** BEGIN SETUP ***************\n';
+            content += '; Turn off spindle and coolant\n';
+            content += 'M5\n';
+            content += 'M9\n';
+            content += '(' + config.printCmd + ', Spindle and coolant turned off)\n\n';
 
-            return content;
+            content += '; Record current units\n';
+            content += 'o200 if [#<_metric> EQ 0]\n';
+            content += '  #<_rc_return_units> = 20\n';
+            content += 'o200 else\n';
+            content += '  #<_rc_return_units> = 21\n';
+            content += 'o200 endif\n';
+            content += '(' + config.printCmd + ', Units recorded)\n\n';
+
+            content += '; Activate configured units and absolute distance mode\n';
+            content += 'G[#<_rc_units>] G90\n';
+            content += '(' + config.printCmd + ', Set units and distance)\n\n';
+
+            // For multi-magazine, just generate a simplified version for now that follows the 2-magazine pattern
+            content += '; Determine current magazine based on current tool number\n';
+            content += 'o205 if [#<_current_tool> LE #<_rc1_pockets>]\n';
+            content += '  #<_current_magazine> = 1 ; Primary magazine (rc1)\n';
+            content += '  (' + config.printCmd + ', Current tool in primary magazine)\n';
+            content += 'o205 else\n';
+            content += '  #<_current_magazine> = 2 ; Secondary magazine (rc2)\n';
+            content += '  (' + config.printCmd + ', Current tool in secondary magazine)\n';
+            content += 'o205 endif\n\n';
+            
+            content += '; Determine selected magazine based on selected tool number\n';
+            content += 'o206 if [#<_selected_tool> LE #<_rc1_pockets>]\n';
+            content += '  #<_selected_magazine> = 1 ; Primary magazine (rc1)\n';
+            content += '  (' + config.printCmd + ', Selected tool in primary magazine)\n';
+            content += 'o206 else\n';
+            content += '  #<_selected_magazine> = 2 ; Secondary magazine (rc2)\n';
+            content += '  (' + config.printCmd + ', Selected tool in secondary magazine)\n';
+            content += 'o206 endif\n\n';
+
+            // Position calculation logic similar to existing TC.macro
+            content += generateMultiMagazinePositionLogic(formData, config);
+
+            content += 'G53 G0 Z[#<_rc_safe_z>]\n';
+            content += '(' + config.printCmd + ', Moved to safe clearance)\n\n';
+
+            // Dust cover opening
+            content += '; Open the dust cover if enabled.\n';
+            content += 'o500 if [#<_rc_cover_mode> EQ 1]\n';
+            content += '  ; Axis Mode: move along the configured axis to the open position.\n';
+            content += '  o510 if [#<_rc_cover_axis> EQ 3]\n';
+            content += '    G53 G0 A[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 4]\n';
+            content += '    G53 G0 B[#<_rc_cover_o_pos>]\n';
+            content += '  o510 elseif [#<_rc_cover_axis> EQ 5]\n';
+            content += '    G53 G0 C[#<_rc_cover_o_pos>]\n';
+            content += '  o510 endif\n';
+            content += 'o500 elseif [#<_rc_cover_mode> EQ 2]\n';
+            content += '  ; Output Mode: Turn on the output and dwell\n';
+            content += '  G4 P0\n';
+            content += '  M64 P[#<_rc_cover_output>]\n';
+            content += '  G4 P[#<_rc_cover_dwell>]\n';
+            content += 'o500 endif\n';
+            content += '; *************** END SETUP ****************\n\n';
+
+            // Unload section
+            content += generateMultiMagazineUnloadLogic(formData, config);
+
+            // Load section  
+            content += generateMultiMagazineLoadLogic(formData, config);
+
+            // Measure section
+            content += generateMeasureLogic(formData, config);
+
+            // Teardown section
+            content += generateTeardownLogic(formData, config);
 
             return content;
         }
 
-        // Generate magazine determination logic for multi-magazine setup
+        // Generate position logic for multi-magazine
+        function generateMultiMagazinePositionLogic(formData, config) {
+            let content = '';
+            
+            // Current tool position logic
+            content += '; Set pocket locations based on selected and current magazines\n';
+            content += 'o210 if [#<_current_magazine> EQ 1]  ; Primary magazine setup\n';
+            content += '  o211 if [#<_rc1_alignment> EQ 0]\n';
+            content += '    #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for primary magazine)\n';
+            content += '    #<_rc_y_unload> = #<_rc1_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for primary magazine)\n';
+            content += '  o211 else\n';
+            content += '    #<_rc_x_unload> = #<_rc1_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for primary magazine)\n';
+            content += '    #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for primary magazine, Y alignment)\n';
+            content += '  o211 endif\n';
+            content += 'o210 else  ; Secondary magazine setup\n';
+            content += '  o212 if [#<_rc2_alignment> EQ 0]\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_current_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_x_unload> = [#<_temp4> + #<_rc2_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for secondary magazine)\n';
+            content += '    #<_rc_y_unload> = #<_rc2_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for secondary magazine)\n';
+            content += '  o212 else\n';
+            content += '    #<_rc_x_unload> = #<_rc2_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Unload X set to #<_rc_x_unload> for secondary magazine)\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_current_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_y_unload> = [#<_temp4> + #<_rc2_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Unload Y set to #<_rc_y_unload> for secondary magazine, Y alignment)\n';
+            content += '  o212 endif\n';
+            content += 'o210 endif\n\n';
+
+            // Selected tool position logic  
+            content += '; Load settings based on selected magazine\n';
+            content += 'o213 if [#<_selected_magazine> EQ 1]  ; Primary magazine setup\n';
+            content += '  o214 if [#<_rc1_alignment> EQ 0]\n';
+            content += '    #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for primary magazine)\n';
+            content += '    #<_rc_y_load> = #<_rc1_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for primary magazine)\n';
+            content += '  o214 else\n';
+            content += '    #<_rc_x_load> = #<_rc1_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for primary magazine)\n';
+            content += '    #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc1_pocket_offset> * #<_rc1_direction>] + #<_rc1_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for primary magazine, Y alignment)\n';
+            content += '  o214 endif\n';
+            content += 'o213 else  ; Secondary magazine setup\n';
+            content += '  o215 if [#<_rc2_alignment> EQ 0]\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_x_load> = [#<_temp4> + #<_rc2_pocket_one_x>]\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for secondary magazine)\n';
+            content += '    #<_rc_y_load> = #<_rc2_pocket_one_y>\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for secondary magazine)\n';
+            content += '  o215 else\n';
+            content += '    #<_rc_x_load> = #<_rc2_pocket_one_x>\n';
+            content += '    (' + config.printCmd + ', Load X set to #<_rc_x_load> for secondary magazine)\n';
+            content += '    #<_temp1> = [#<_rc1_pockets> + 1]\n';
+            content += '    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n';
+            content += '    #<_temp3> = [#<_temp2> * #<_rc2_pocket_offset>]\n';
+            content += '    #<_temp4> = [#<_temp3> * #<_rc2_direction>]\n';
+            content += '    #<_rc_y_load> = [#<_temp4> + #<_rc2_pocket_one_y>]\n';
+            content += '    (' + config.printCmd + ', Load Y set to #<_rc_y_load> for secondary magazine, Y alignment)\n';
+            content += '  o215 endif\n';
+            content += 'o213 endif\n\n';
+
+            return content;
+        }
         function generateMagazineDeterminationLogic(formData, toolVar, operation) {
             let content = '';
             let totalPockets = 0;
