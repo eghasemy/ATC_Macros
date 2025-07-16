@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 840px; /* Reduced by 30% from 1200px */
+            max-width: 1008px; /* Increased by 20% from 840px */
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -49,27 +49,47 @@
             padding: 30px;
         }
 
-        /* Responsive grid layout for wider screens */
-        @media (min-width: 1200px) {
+        /* Form section wrapper for grid items */
+        .form-section {
+            margin-bottom: 10px;
+        }
+        
+        .form-section-full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Dynamic responsive grid layout for wider screens */
+        /* When window width allows n sections side by side, create n columns */
+        @media (min-width: 2016px) { /* 2 * 1008px */
             .form-container {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 gap: 30px;
-                max-width: 1400px;
+                max-width: 2100px;
                 margin: 0 auto;
                 padding: 30px;
             }
-            
-            .form-left-column {
-                grid-column: 1;
+        }
+        
+        @media (min-width: 3024px) { /* 3 * 1008px */
+            .form-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 30px;
+                max-width: 3150px;
+                margin: 0 auto;
+                padding: 30px;
             }
-            
-            .form-right-column {
-                grid-column: 2;
-            }
-            
-            .form-full-width {
-                grid-column: 1 / -1;
+        }
+        
+        @media (min-width: 4032px) { /* 4 * 1008px */
+            .form-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 30px;
+                max-width: 4200px;
+                margin: 0 auto;
+                padding: 30px;
             }
         }
 
@@ -325,10 +345,9 @@
 
         <div class="form-container">
             <form id="atcForm">
-                <!-- Left Column -->
-                <div class="form-left-column">
-                    <!-- Firmware Selection -->
-                    <button type="button" class="collapsible active">Firmware Selection</button>
+                <!-- Firmware Selection -->
+                <div class="form-section">
+                <button type="button" class="collapsible active">Firmware Selection</button>
                     <div class="content active">
                         <div class="form-group">
                             <label for="firmware">Target Firmware:</label>
@@ -341,8 +360,10 @@
                             </div>
                         </div>
                     </div>
+                </div>
 
                     <!-- Magazine Configuration -->
+                    <div class="form-section">
                     <button type="button" class="collapsible active">Magazine Configuration</button>
                     <div class="content active">
                         <div class="form-group">
@@ -363,8 +384,10 @@
                             <!-- Magazine configurations will be dynamically inserted here -->
                         </div>
                     </div>
+                    </div>
 
                     <!-- Basic Settings -->
+                    <div class="form-section">
                     <button type="button" class="collapsible">Basic Settings</button>
                     <div class="content">
                         <div class="form-row">
@@ -381,8 +404,10 @@
                             </div>
                         </div>
                     </div>
+                    </div>
 
                     <!-- Z-Axis Settings -->
+                    <div class="form-section">
                     <button type="button" class="collapsible">Z-Axis Settings</button>
                     <div class="content">
                         <div class="form-row">
@@ -418,9 +443,10 @@
                     </div>
                 </div>
 
-                <!-- Right Column -->
-                <div class="form-right-column">
-                    <!-- Spindle Settings -->
+                                    </div>
+
+                <!-- Spindle Settings -->
+                <div class="form-section">
                     <button type="button" class="collapsible">Spindle Settings</button>
                     <div class="content">
                         <div class="form-row">
@@ -583,9 +609,7 @@
                     </div>
                 </div>
 
-                <!-- Full Width Sections -->
-                <div class="form-full-width">
-                    <!-- Action Buttons -->
+                <!-- Action Buttons -->
                     <div class="button-group">
                         <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
                         <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
@@ -611,7 +635,6 @@
                             <div class="preview-content" id="previewTc"></div>
                         </div>
                     </div>
-                </div>
             </form>
         </div>
     </div>
@@ -1788,27 +1811,11 @@
             content += 'G[#<_rc_units>] G90\n';
             content += '(' + config.printCmd + ', Set units and distance)\n\n';
 
-            // For multi-magazine, just generate a simplified version for now that follows the 2-magazine pattern
-            content += '; Determine current magazine based on current tool number\n';
-            content += 'o205 if [#<_current_tool> LE #<_rc1_pockets>]\n';
-            content += '  #<_current_magazine> = 1 ; Primary magazine (rc1)\n';
-            content += '  (' + config.printCmd + ', Current tool in primary magazine)\n';
-            content += 'o205 else\n';
-            content += '  #<_current_magazine> = 2 ; Secondary magazine (rc2)\n';
-            content += '  (' + config.printCmd + ', Current tool in secondary magazine)\n';
-            content += 'o205 endif\n\n';
-            
-            content += '; Determine selected magazine based on selected tool number\n';
-            content += 'o206 if [#<_selected_tool> LE #<_rc1_pockets>]\n';
-            content += '  #<_selected_magazine> = 1 ; Primary magazine (rc1)\n';
-            content += '  (' + config.printCmd + ', Selected tool in primary magazine)\n';
-            content += 'o206 else\n';
-            content += '  #<_selected_magazine> = 2 ; Secondary magazine (rc2)\n';
-            content += '  (' + config.printCmd + ', Selected tool in secondary magazine)\n';
-            content += 'o206 endif\n\n';
+            // Generate dynamic magazine determination logic for multi-magazine
+            content += generateDynamicMagazineDetermination(formData, config);
 
-            // Position calculation logic similar to existing TC.macro
-            content += generateMultiMagazinePositionLogic(formData, config);
+            // Position calculation logic for all magazines
+            content += generateDynamicMultiMagazinePositionLogic(formData, config);
 
             content += 'G53 G0 Z[#<_rc_safe_z>]\n';
             content += '(' + config.printCmd + ', Moved to safe clearance)\n\n';
@@ -1843,6 +1850,188 @@
 
             // Teardown section
             content += generateTeardownLogic(formData, config);
+
+            return content;
+        }
+
+        // Generate dynamic magazine determination logic for all magazines
+        function generateDynamicMagazineDetermination(formData, config) {
+            let content = '';
+            
+            // Determine current tool magazine
+            content += '; Determine current magazine based on current tool number\n';
+            let totalPockets = 0;
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                const prevTotalPockets = totalPockets;
+                totalPockets += parseInt(mag.pockets);
+                
+                if (i === 0) {
+                    content += `o205 if [#<_current_tool> LE ${totalPockets}]\n`;
+                } else {
+                    content += `o205 elseif [#<_current_tool> GT ${prevTotalPockets} AND #<_current_tool> LE ${totalPockets}]\n`;
+                }
+                content += `  #<_current_magazine> = ${magNum}\n`;
+                content += `  (${config.printCmd}, Current tool in magazine ${magNum})\n`;
+            }
+            content += 'o205 endif\n\n';
+            
+            // Determine selected tool magazine
+            content += '; Determine selected magazine based on selected tool number\n';
+            totalPockets = 0;
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                const prevTotalPockets = totalPockets;
+                totalPockets += parseInt(mag.pockets);
+                
+                if (i === 0) {
+                    content += `o206 if [#<_selected_tool> LE ${totalPockets}]\n`;
+                } else {
+                    content += `o206 elseif [#<_selected_tool> GT ${prevTotalPockets} AND #<_selected_tool> LE ${totalPockets}]\n`;
+                }
+                content += `  #<_selected_magazine> = ${magNum}\n`;
+                content += `  (${config.printCmd}, Selected tool in magazine ${magNum})\n`;
+            }
+            content += 'o206 endif\n\n';
+            
+            return content;
+        }
+
+        // Generate position logic for all magazines dynamically
+        function generateDynamicMultiMagazinePositionLogic(formData, config) {
+            let content = '';
+            
+            // Current tool position logic
+            content += '; Set pocket locations based on selected and current magazines\n';
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                
+                if (i === 0) {
+                    content += `o210 if [#<_current_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                } else {
+                    content += `o210 elseif [#<_current_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                }
+                
+                content += `  o21${magNum} if [#<_rc${magNum}_alignment> EQ 0]\n`;
+                
+                if (i === 0) {
+                    // First magazine uses direct tool number
+                    content += `    #<_rc_x_unload> = [[[#<_current_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_x>]\n`;
+                } else {
+                    // Other magazines need to subtract cumulative pocket count from previous magazines
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_x_unload> = [#<_temp4> + #<_rc${magNum}_pocket_one_x>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Unload X set to #<_rc_x_unload> for magazine ${magNum})\n`;
+                content += `    #<_rc_y_unload> = #<_rc${magNum}_pocket_one_y>\n`;
+                content += `    (${config.printCmd}, Unload Y set to #<_rc_y_unload> for magazine ${magNum})\n`;
+                content += `  o21${magNum} else\n`;
+                content += `    #<_rc_x_unload> = #<_rc${magNum}_pocket_one_x>\n`;
+                content += `    (${config.printCmd}, Unload X set to #<_rc_x_unload> for magazine ${magNum})\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_y_unload> = [[[#<_current_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_y>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_current_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_y_unload> = [#<_temp4> + #<_rc${magNum}_pocket_one_y>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Unload Y set to #<_rc_y_unload> for magazine ${magNum}, Y alignment)\n`;
+                content += `  o21${magNum} endif\n`;
+            }
+            content += 'o210 endif\n\n';
+
+            // Selected tool position logic  
+            content += '; Load settings based on selected magazine\n';
+            
+            for (let i = 0; i < formData.magazineCount; i++) {
+                const magNum = i + 1;
+                const mag = formData.magazines[i];
+                
+                if (i === 0) {
+                    content += `o213 if [#<_selected_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                } else {
+                    content += `o213 elseif [#<_selected_magazine> EQ ${magNum}]  ; Magazine ${magNum} setup\n`;
+                }
+                
+                content += `  o21${magNum + 10} if [#<_rc${magNum}_alignment> EQ 0]\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_x_load> = [[[#<_selected_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_x>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_x_load> = [#<_temp4> + #<_rc${magNum}_pocket_one_x>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Load X set to #<_rc_x_load> for magazine ${magNum})\n`;
+                content += `    #<_rc_y_load> = #<_rc${magNum}_pocket_one_y>\n`;
+                content += `    (${config.printCmd}, Load Y set to #<_rc_y_load> for magazine ${magNum})\n`;
+                content += `  o21${magNum + 10} else\n`;
+                content += `    #<_rc_x_load> = #<_rc${magNum}_pocket_one_x>\n`;
+                content += `    (${config.printCmd}, Load X set to #<_rc_x_load> for magazine ${magNum})\n`;
+                
+                if (i === 0) {
+                    content += `    #<_rc_y_load> = [[[#<_selected_tool> - 1] * #<_rc${magNum}_pocket_offset> * #<_rc${magNum}_direction>] + #<_rc${magNum}_pocket_one_y>]\n`;
+                } else {
+                    let prevPockets = '';
+                    for (let j = 0; j < i; j++) {
+                        if (j === 0) {
+                            prevPockets = `#<_rc${j+1}_pockets>`;
+                        } else {
+                            prevPockets += ` + #<_rc${j+1}_pockets>`;
+                        }
+                    }
+                    content += `    #<_temp1> = [${prevPockets}]\n`;
+                    content += `    #<_temp2> = [#<_selected_tool> - #<_temp1>]\n`;
+                    content += `    #<_temp3> = [#<_temp2> * #<_rc${magNum}_pocket_offset>]\n`;
+                    content += `    #<_temp4> = [#<_temp3> * #<_rc${magNum}_direction>]\n`;
+                    content += `    #<_rc_y_load> = [#<_temp4> + #<_rc${magNum}_pocket_one_y>]\n`;
+                }
+                
+                content += `    (${config.printCmd}, Load Y set to #<_rc_y_load> for magazine ${magNum}, Y alignment)\n`;
+                content += `  o21${magNum + 10} endif\n`;
+            }
+            content += 'o213 endif\n\n';
 
             return content;
         }
