@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 840px; /* Reduced by 30% from 1200px */
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -29,7 +29,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #666666 0%, #444444 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -47,6 +47,30 @@
 
         .form-container {
             padding: 30px;
+        }
+
+        /* Responsive grid layout for wider screens */
+        @media (min-width: 1200px) {
+            .form-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 30px;
+            }
+            
+            .form-left-column {
+                grid-column: 1;
+            }
+            
+            .form-right-column {
+                grid-column: 2;
+            }
+            
+            .form-full-width {
+                grid-column: 1 / -1;
+            }
         }
 
         .collapsible {
@@ -71,7 +95,7 @@
         }
 
         .collapsible.active {
-            background-color: #007bff;
+            background-color: #666666;
             color: white;
         }
 
@@ -140,8 +164,8 @@
         input[type="number"]:focus,
         select:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+            border-color: #666666;
+            box-shadow: 0 0 0 3px rgba(102,102,102,0.1);
         }
 
         .magazine-config {
@@ -153,7 +177,7 @@
         }
 
         .magazine-config h3 {
-            color: #007bff;
+            color: #555555;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
@@ -167,7 +191,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(135deg, #666666 0%, #444444 100%);
             color: white;
             border: none;
             padding: 15px 30px;
@@ -183,7 +207,7 @@
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            box-shadow: 0 4px 15px rgba(102,102,102,0.3);
         }
 
         .btn:active {
@@ -191,16 +215,16 @@
         }
 
         .btn.secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            background: linear-gradient(135deg, #777777 0%, #555555 100%);
         }
 
         .btn.secondary:hover {
-            box-shadow: 0 4px 15px rgba(108,117,125,0.3);
+            box-shadow: 0 4px 15px rgba(119,119,119,0.3);
         }
 
         .download-section {
-            background-color: #e8f5e8;
-            border: 2px solid #28a745;
+            background-color: #f0f0f0;
+            border: 2px solid #888888;
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
@@ -208,7 +232,7 @@
         }
 
         .download-btn {
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            background: linear-gradient(135deg, #888888 0%, #666666 100%);
             color: white;
             border: none;
             padding: 12px 25px;
@@ -223,7 +247,7 @@
 
         .download-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+            box-shadow: 0 4px 15px rgba(136,136,136,0.3);
         }
 
         .preview-section {
@@ -301,285 +325,294 @@
 
         <div class="form-container">
             <form id="atcForm">
-                <!-- Firmware Selection -->
-                <button type="button" class="collapsible active">Firmware Selection</button>
-                <div class="content active">
-                    <div class="form-group">
-                        <label for="firmware">Target Firmware:</label>
-                        <select id="firmware" name="firmware">
-                            <option value="fluidnc" selected>FluidNC</option>
-                            <option value="grblhal">grblHAL</option>
-                        </select>
-                        <div id="firmwareDescription" class="description">
-                            Select the firmware for which you want to generate configuration files.
+                <!-- Left Column -->
+                <div class="form-left-column">
+                    <!-- Firmware Selection -->
+                    <button type="button" class="collapsible active">Firmware Selection</button>
+                    <div class="content active">
+                        <div class="form-group">
+                            <label for="firmware">Target Firmware:</label>
+                            <select id="firmware" name="firmware">
+                                <option value="fluidnc" selected>FluidNC</option>
+                                <option value="grblhal">grblHAL</option>
+                            </select>
+                            <div id="firmwareDescription" class="description">
+                                Select the firmware for which you want to generate configuration files.
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Magazine Configuration -->
-                <button type="button" class="collapsible active">Magazine Configuration</button>
-                <div class="content active">
-                    <div class="form-group">
-                        <label for="magazineCount">Number of Magazines (1-8):</label>
-                        <select id="magazineCount" name="magazineCount">
-                            <option value="1">1 Magazine</option>
-                            <option value="2">2 Magazines</option>
-                            <option value="3">3 Magazines</option>
-                            <option value="4">4 Magazines</option>
-                            <option value="5">5 Magazines</option>
-                            <option value="6">6 Magazines</option>
-                            <option value="7">7 Magazines</option>
-                            <option value="8">8 Magazines</option>
-                        </select>
-                    </div>
-
-                    <div id="magazineConfigs">
-                        <!-- Magazine configurations will be dynamically inserted here -->
-                    </div>
-                </div>
-
-                <!-- Basic Settings -->
-                <button type="button" class="collapsible">Basic Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="units">Units:</label>
-                            <select id="units" name="units">
-                                <option value="20">Inches (20)</option>
-                                <option value="21" selected>Millimeters (21)</option>
+                    <!-- Magazine Configuration -->
+                    <button type="button" class="collapsible active">Magazine Configuration</button>
+                    <div class="content active">
+                        <div class="form-group">
+                            <label for="magazineCount">Number of Magazines (1-8):</label>
+                            <select id="magazineCount" name="magazineCount">
+                                <option value="1">1 Magazine</option>
+                                <option value="2">2 Magazines</option>
+                                <option value="3">3 Magazines</option>
+                                <option value="4">4 Magazines</option>
+                                <option value="5">5 Magazines</option>
+                                <option value="6">6 Magazines</option>
+                                <option value="7">7 Magazines</option>
+                                <option value="8">8 Magazines</option>
                             </select>
                         </div>
-                        <div class="form-col">
-                            <label for="pocketOffset">Pocket Offset:</label>
-                            <input type="number" id="pocketOffset" name="pocketOffset" value="35" step="0.1">
+
+                        <div id="magazineConfigs">
+                            <!-- Magazine configurations will be dynamically inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Basic Settings -->
+                    <button type="button" class="collapsible">Basic Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="units">Units:</label>
+                                <select id="units" name="units">
+                                    <option value="20">Inches (20)</option>
+                                    <option value="21" selected>Millimeters (21)</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="pocketOffset">Pocket Offset:</label>
+                                <input type="number" id="pocketOffset" name="pocketOffset" value="35" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Z-Axis Settings -->
+                    <button type="button" class="collapsible">Z-Axis Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="engageZ">Engage Z Position:</label>
+                                <input type="number" id="engageZ" name="engageZ" value="-141.5" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="loadSpinZ">Load Spindle Start Z:</label>
+                                <input type="number" id="loadSpinZ" name="loadSpinZ" value="-125" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="toLoadZ">Move To Load Z:</label>
+                                <input type="number" id="toLoadZ" name="toLoadZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="toMeasureZ">Move To Measure Z:</label>
+                                <input type="number" id="toMeasureZ" name="toMeasureZ" value="-80" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="safeZ">Safe Clearance Z:</label>
+                                <input type="number" id="safeZ" name="safeZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="plungeCount">Load Plunge Count:</label>
+                                <input type="number" id="plungeCount" name="plungeCount" value="2" min="1" max="10">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Z-Axis Settings -->
-                <button type="button" class="collapsible">Z-Axis Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="engageZ">Engage Z Position:</label>
-                            <input type="number" id="engageZ" name="engageZ" value="-141.5" step="0.1">
+                <!-- Right Column -->
+                <div class="form-right-column">
+                    <!-- Spindle Settings -->
+                    <button type="button" class="collapsible">Spindle Settings</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="engageFeed">Engage Feed Rate:</label>
+                                <input type="number" id="engageFeed" name="engageFeed" value="2000" min="1">
+                            </div>
+                            <div class="form-col">
+                                <label for="unloadRpm">Unload RPM (CCW):</label>
+                                <input type="number" id="unloadRpm" name="unloadRpm" value="2000" min="1">
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="loadSpinZ">Load Spindle Start Z:</label>
-                            <input type="number" id="loadSpinZ" name="loadSpinZ" value="-125" step="0.1">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="loadRpm">Load RPM (CW):</label>
+                                <input type="number" id="loadRpm" name="loadRpm" value="1600" min="1">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="toLoadZ">Move To Load Z:</label>
-                            <input type="number" id="toLoadZ" name="toLoadZ" value="-80" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="toMeasureZ">Move To Measure Z:</label>
-                            <input type="number" id="toMeasureZ" name="toMeasureZ" value="-80" step="0.1">
+
+                    <!-- Manual Tool Change -->
+                    <button type="button" class="collapsible">Manual Tool Change</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="manualX">Manual Change X Position:</label>
+                                <input type="number" id="manualX" name="manualX" value="100" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="manualY">Manual Change Y Position:</label>
+                                <input type="number" id="manualY" name="manualY" value="50" step="0.1">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="safeZ">Safe Clearance Z:</label>
-                            <input type="number" id="safeZ" name="safeZ" value="-80" step="0.1">
+
+                    <!-- Dust Cover -->
+                    <button type="button" class="collapsible">Dust Cover</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverMode">Dust Cover Mode:</label>
+                                <select id="coverMode" name="coverMode">
+                                    <option value="0" selected>Disabled</option>
+                                    <option value="1">Axis</option>
+                                    <option value="2">Output</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="coverAxis">Dust Cover Axis (if Axis mode):</label>
+                                <select id="coverAxis" name="coverAxis">
+                                    <option value="0" selected>None</option>
+                                    <option value="3">A Axis</option>
+                                    <option value="4">B Axis</option>
+                                    <option value="5">C Axis</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-col">
-                            <label for="plungeCount">Load Plunge Count:</label>
-                            <input type="number" id="plungeCount" name="plungeCount" value="2" min="1" max="10">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverClosedPos">Closed Position:</label>
+                                <input type="number" id="coverClosedPos" name="coverClosedPos" value="0" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="coverOpenPos">Open Position:</label>
+                                <input type="number" id="coverOpenPos" name="coverOpenPos" value="0" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="coverOutput">Output Number (if Output mode):</label>
+                                <input type="number" id="coverOutput" name="coverOutput" value="0" min="0">
+                            </div>
+                            <div class="form-col">
+                                <label for="coverDwell">Dwell Time (seconds):</label>
+                                <input type="number" id="coverDwell" name="coverDwell" value="1" step="0.1" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool Recognition -->
+                    <button type="button" class="collapsible">Tool Recognition</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="recognize">Tool Recognition Mode:</label>
+                                <select id="recognize" name="recognize">
+                                    <option value="0" selected>Disabled - User confirmation only</option>
+                                    <option value="1">Enabled</option>
+                                </select>
+                            </div>
+                            <div class="form-col">
+                                <label for="recInput">IR Sensor Input Number:</label>
+                                <input type="number" id="recInput" name="recInput" value="0" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="zoneOneZ">Zone 1 Z Position:</label>
+                                <input type="number" id="zoneOneZ" name="zoneOneZ" value="-63.5" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="zoneTwoZ">Zone 2 Z Position:</label>
+                                <input type="number" id="zoneTwoZ" name="zoneTwoZ" value="-57.0" step="0.1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool Measurement -->
+                    <button type="button" class="collapsible">Tool Measurement</button>
+                    <div class="content">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measure">Tool Measurement Mode:</label>
+                                <select id="measure" name="measure">
+                                    <option value="0">Disabled</option>
+                                    <option value="1" selected>Enabled</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measureX">Tool Setter X Position:</label>
+                                <input type="number" id="measureX" name="measureX" value="1184.7" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="measureY">Tool Setter Y Position:</label>
+                                <input type="number" id="measureY" name="measureY" value="74.7" step="0.1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="measureStartZ">Measurement Start Z:</label>
+                                <input type="number" id="measureStartZ" name="measureStartZ" value="-80" step="0.1">
+                            </div>
+                            <div class="form-col">
+                                <label for="seekDist">Seek Distance:</label>
+                                <input type="number" id="seekDist" name="seekDist" value="150" step="0.1" min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="retractDist">Retract Distance:</label>
+                                <input type="number" id="retractDist" name="retractDist" value="1" step="0.1" min="0">
+                            </div>
+                            <div class="form-col">
+                                <label for="seekFeed">Seek Feed Rate:</label>
+                                <input type="number" id="seekFeed" name="seekFeed" value="500" min="1">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label for="setFeed">Set Feed Rate:</label>
+                                <input type="number" id="setFeed" name="setFeed" value="25" min="1">
+                            </div>
+                            <div class="form-col">
+                                <label for="tloRef">TLO Reference Position:</label>
+                                <input type="number" id="tloRef" name="tloRef" value="0" step="0.1">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Spindle Settings -->
-                <button type="button" class="collapsible">Spindle Settings</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="engageFeed">Engage Feed Rate:</label>
-                            <input type="number" id="engageFeed" name="engageFeed" value="2000" min="1">
-                        </div>
-                        <div class="form-col">
-                            <label for="unloadRpm">Unload RPM (CCW):</label>
-                            <input type="number" id="unloadRpm" name="unloadRpm" value="2000" min="1">
-                        </div>
+                <!-- Full Width Sections -->
+                <div class="form-full-width">
+                    <!-- Action Buttons -->
+                    <div class="button-group">
+                        <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
+                        <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
                     </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="loadRpm">Load RPM (CW):</label>
-                            <input type="number" id="loadRpm" name="loadRpm" value="1600" min="1">
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Manual Tool Change -->
-                <button type="button" class="collapsible">Manual Tool Change</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="manualX">Manual Change X Position:</label>
-                            <input type="number" id="manualX" name="manualX" value="100" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="manualY">Manual Change Y Position:</label>
-                            <input type="number" id="manualY" name="manualY" value="50" step="0.1">
-                        </div>
+                    <!-- Download Section -->
+                    <div id="downloadSection" class="download-section hidden">
+                        <h3>Files Generated Successfully!</h3>
+                        <p>Your configuration files are ready for download:</p>
+                        <a href="#" id="downloadInitBtn" class="download-btn">Download</a>
+                        <a href="#" id="downloadTcBtn" class="download-btn">Download</a>
                     </div>
-                </div>
 
-                <!-- Dust Cover -->
-                <button type="button" class="collapsible">Dust Cover</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverMode">Dust Cover Mode:</label>
-                            <select id="coverMode" name="coverMode">
-                                <option value="0" selected>Disabled</option>
-                                <option value="1">Axis</option>
-                                <option value="2">Output</option>
-                            </select>
+                    <!-- Preview Section -->
+                    <div id="previewSection" class="preview-section hidden">
+                        <h3>File Preview</h3>
+                        <div class="preview-file">
+                            <div class="preview-header" id="previewInitHeader">Configuration File</div>
+                            <div class="preview-content" id="previewInit"></div>
                         </div>
-                        <div class="form-col">
-                            <label for="coverAxis">Dust Cover Axis (if Axis mode):</label>
-                            <select id="coverAxis" name="coverAxis">
-                                <option value="0" selected>None</option>
-                                <option value="3">A Axis</option>
-                                <option value="4">B Axis</option>
-                                <option value="5">C Axis</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverClosedPos">Closed Position:</label>
-                            <input type="number" id="coverClosedPos" name="coverClosedPos" value="0" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="coverOpenPos">Open Position:</label>
-                            <input type="number" id="coverOpenPos" name="coverOpenPos" value="0" step="0.1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="coverOutput">Output Number (if Output mode):</label>
-                            <input type="number" id="coverOutput" name="coverOutput" value="0" min="0">
-                        </div>
-                        <div class="form-col">
-                            <label for="coverDwell">Dwell Time (seconds):</label>
-                            <input type="number" id="coverDwell" name="coverDwell" value="1" step="0.1" min="0">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tool Recognition -->
-                <button type="button" class="collapsible">Tool Recognition</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="recognize">Tool Recognition Mode:</label>
-                            <select id="recognize" name="recognize">
-                                <option value="0" selected>Disabled - User confirmation only</option>
-                                <option value="1">Enabled</option>
-                            </select>
-                        </div>
-                        <div class="form-col">
-                            <label for="recInput">IR Sensor Input Number:</label>
-                            <input type="number" id="recInput" name="recInput" value="0" min="0">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="zoneOneZ">Zone 1 Z Position:</label>
-                            <input type="number" id="zoneOneZ" name="zoneOneZ" value="-63.5" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="zoneTwoZ">Zone 2 Z Position:</label>
-                            <input type="number" id="zoneTwoZ" name="zoneTwoZ" value="-57.0" step="0.1">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tool Measurement -->
-                <button type="button" class="collapsible">Tool Measurement</button>
-                <div class="content">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measure">Tool Measurement Mode:</label>
-                            <select id="measure" name="measure">
-                                <option value="0">Disabled</option>
-                                <option value="1" selected>Enabled</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measureX">Tool Setter X Position:</label>
-                            <input type="number" id="measureX" name="measureX" value="1184.7" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="measureY">Tool Setter Y Position:</label>
-                            <input type="number" id="measureY" name="measureY" value="74.7" step="0.1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="measureStartZ">Measurement Start Z:</label>
-                            <input type="number" id="measureStartZ" name="measureStartZ" value="-80" step="0.1">
-                        </div>
-                        <div class="form-col">
-                            <label for="seekDist">Seek Distance:</label>
-                            <input type="number" id="seekDist" name="seekDist" value="150" step="0.1" min="0">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="retractDist">Retract Distance:</label>
-                            <input type="number" id="retractDist" name="retractDist" value="1" step="0.1" min="0">
-                        </div>
-                        <div class="form-col">
-                            <label for="seekFeed">Seek Feed Rate:</label>
-                            <input type="number" id="seekFeed" name="seekFeed" value="500" min="1">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-col">
-                            <label for="setFeed">Set Feed Rate:</label>
-                            <input type="number" id="setFeed" name="setFeed" value="25" min="1">
-                        </div>
-                        <div class="form-col">
-                            <label for="tloRef">TLO Reference Position:</label>
-                            <input type="number" id="tloRef" name="tloRef" value="0" step="0.1">
+                        <div class="preview-file">
+                            <div class="preview-header" id="previewTcHeader">Tool Change File</div>
+                            <div class="preview-content" id="previewTc"></div>
                         </div>
                     </div>
                 </div>
             </form>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button type="button" class="btn" id="generateBtn">Generate Configuration</button>
-                <button type="button" class="btn secondary" id="resetBtn">Reset Form</button>
-            </div>
-
-            <!-- Download Section -->
-            <div id="downloadSection" class="download-section hidden">
-                <h3>Files Generated Successfully!</h3>
-                <p>Your configuration files are ready for download:</p>
-                <a href="#" id="downloadInitBtn" class="download-btn">Download</a>
-                <a href="#" id="downloadTcBtn" class="download-btn">Download</a>
-            </div>
-
-            <!-- Preview Section -->
-            <div id="previewSection" class="preview-section hidden">
-                <h3>File Preview</h3>
-                <div class="preview-file">
-                    <div class="preview-header" id="previewInitHeader">Configuration File</div>
-                    <div class="preview-content" id="previewInit"></div>
-                </div>
-                <div class="preview-file">
-                    <div class="preview-header" id="previewTcHeader">Tool Change File</div>
-                    <div class="preview-content" id="previewTc"></div>
-                </div>
-            </div>
         </div>
     </div>
 
