@@ -4,6 +4,10 @@ const config = {
     magazineCount: 2,
     units: 21,
     engageZ: -141.5,
+    loadSpinZ: -125,
+    plungeCount: 2,
+    toLoadZ: -80,
+    toMeasureZ: -80,
     safeZ: -80,
     engageFeed: 2000,
     unloadRpm: 2000,
@@ -16,8 +20,19 @@ const config = {
     retractDistance: 1,
     seekFeed: 500,
     setFeed: 25,
+    tloRef: 0,
     manualX: 100,
     manualY: 50,
+    coverMode: 0,
+    coverAxis: 3,
+    coverClosedPos: 0,
+    coverOpenPos: 0,
+    coverOutput: 0,
+    coverDwell: 1,
+    recognizeEnabled: false,
+    recInput: 0,
+    zoneOneZ: -63.5,
+    zoneTwoZ: -57.0,
     magazines: []
 };
 
@@ -36,6 +51,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
     updateMagazineConfiguration();
     loadConfiguration();
+    
+    // Initialize dynamic sections
+    toggleMeasurementSettings();
+    toggleRecognitionSettings();
+    toggleDustCoverSettings();
 });
 
 function initializeEventListeners() {
@@ -59,6 +79,18 @@ function initializeEventListeners() {
         toggleMeasurementSettings();
     });
 
+    // Tool recognition toggle
+    document.getElementById('recognize-enabled').addEventListener('change', (e) => {
+        config.recognizeEnabled = e.target.checked;
+        toggleRecognitionSettings();
+    });
+
+    // Dust cover mode change
+    document.getElementById('cover-mode').addEventListener('change', (e) => {
+        config.coverMode = parseInt(e.target.value);
+        toggleDustCoverSettings();
+    });
+
     // Generate button
     document.getElementById('generate-btn').addEventListener('click', generateMacros);
 
@@ -74,9 +106,11 @@ function initializeEventListeners() {
 
 function setupGlobalSettingsListeners() {
     const inputs = [
-        'units', 'engage-z', 'safe-z', 'engage-feed', 'unload-rpm', 'load-rpm',
-        'measure-x', 'measure-y', 'measure-start-z', 'seek-distance', 
-        'retract-distance', 'seek-feed', 'set-feed', 'manual-x', 'manual-y'
+        'units', 'engage-z', 'load-spin-z', 'plunge-count', 'to-load-z', 'to-measure-z', 
+        'safe-z', 'engage-feed', 'unload-rpm', 'load-rpm', 'measure-x', 'measure-y', 
+        'measure-start-z', 'seek-distance', 'retract-distance', 'seek-feed', 'set-feed', 
+        'tlo-ref', 'manual-x', 'manual-y', 'cover-mode', 'cover-axis', 'cover-closed-pos', 
+        'cover-open-pos', 'cover-output', 'cover-dwell', 'rec-input', 'zone-one-z', 'zone-two-z'
     ];
 
     inputs.forEach(id => {
@@ -84,7 +118,13 @@ function setupGlobalSettingsListeners() {
         if (element) {
             element.addEventListener('change', (e) => {
                 const key = id.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-                config[key] = element.type === 'number' ? parseFloat(e.target.value) : e.target.value;
+                config[key] = element.type === 'number' ? parseFloat(e.target.value) : 
+                             element.type === 'select-one' ? parseInt(e.target.value) : e.target.value;
+                
+                // Handle special cases for dynamic settings
+                if (id === 'cover-mode') {
+                    toggleDustCoverSettings();
+                }
             });
         }
     });
@@ -222,7 +262,20 @@ function setupMagazineListeners(magazineNum) {
 
 function toggleMeasurementSettings() {
     const settings = document.getElementById('measurement-settings');
-    settings.style.display = config.measureEnabled ? 'grid' : 'none';
+    settings.style.display = config.measureEnabled ? 'block' : 'none';
+}
+
+function toggleRecognitionSettings() {
+    const settings = document.getElementById('recognition-settings');
+    settings.style.display = config.recognizeEnabled ? 'block' : 'none';
+}
+
+function toggleDustCoverSettings() {
+    const axisSettings = document.getElementById('axis-settings');
+    const outputSettings = document.getElementById('output-settings');
+    
+    axisSettings.style.display = config.coverMode === 1 ? 'block' : 'none';
+    outputSettings.style.display = config.coverMode === 2 ? 'block' : 'none';
 }
 
 function loadConfiguration() {
@@ -230,6 +283,10 @@ function loadConfiguration() {
     config.firmware = document.querySelector('input[name="firmware"]:checked').value;
     config.units = parseInt(document.getElementById('units').value);
     config.engageZ = parseFloat(document.getElementById('engage-z').value);
+    config.loadSpinZ = parseFloat(document.getElementById('load-spin-z').value);
+    config.plungeCount = parseInt(document.getElementById('plunge-count').value);
+    config.toLoadZ = parseFloat(document.getElementById('to-load-z').value);
+    config.toMeasureZ = parseFloat(document.getElementById('to-measure-z').value);
     config.safeZ = parseFloat(document.getElementById('safe-z').value);
     config.engageFeed = parseFloat(document.getElementById('engage-feed').value);
     config.unloadRpm = parseFloat(document.getElementById('unload-rpm').value);
@@ -244,12 +301,31 @@ function loadConfiguration() {
         config.retractDistance = parseFloat(document.getElementById('retract-distance').value);
         config.seekFeed = parseFloat(document.getElementById('seek-feed').value);
         config.setFeed = parseFloat(document.getElementById('set-feed').value);
+        config.tloRef = parseFloat(document.getElementById('tlo-ref').value);
     }
     
     config.manualX = parseFloat(document.getElementById('manual-x').value);
     config.manualY = parseFloat(document.getElementById('manual-y').value);
     
+    // Dust cover settings
+    config.coverMode = parseInt(document.getElementById('cover-mode').value);
+    config.coverAxis = parseInt(document.getElementById('cover-axis').value);
+    config.coverClosedPos = parseFloat(document.getElementById('cover-closed-pos').value);
+    config.coverOpenPos = parseFloat(document.getElementById('cover-open-pos').value);
+    config.coverOutput = parseInt(document.getElementById('cover-output').value);
+    config.coverDwell = parseFloat(document.getElementById('cover-dwell').value);
+    
+    // Tool recognition settings
+    config.recognizeEnabled = document.getElementById('recognize-enabled').checked;
+    if (config.recognizeEnabled) {
+        config.recInput = parseInt(document.getElementById('rec-input').value);
+        config.zoneOneZ = parseFloat(document.getElementById('zone-one-z').value);
+        config.zoneTwoZ = parseFloat(document.getElementById('zone-two-z').value);
+    }
+    
     toggleMeasurementSettings();
+    toggleRecognitionSettings();
+    toggleDustCoverSettings();
 }
 
 function generateMacros() {
@@ -380,19 +456,19 @@ function generateFluidNCInit() {
 (print,Engage Z: #<_rc_engage_z>)
 
 ; The Z machine coordinate position at which to start the spindle when loading.
-#<_rc_load_spin_z> = ${config.engageZ + 16.5}
+#<_rc_load_spin_z> = ${config.loadSpinZ}
 (print,Load Spindle Start Z: #<_rc_load_spin_z>)
 
 ; The number of times to plunge when loading.
-#<_rc_plunge_count> = 2
+#<_rc_plunge_count> = ${config.plungeCount}
 (print,Load Plunge Count: #<_rc_plunge_count>)
 
 ; The Z machine coordinate position to rise to after unloading, before moving to load. (No Tool Loaded RV)
-#<_rc_to_load_z> = ${config.safeZ}
+#<_rc_to_load_z> = ${config.toLoadZ}
 (print,Move To Load Z: #<_rc_to_load_z>)
 
 ; The Z machine coordinate position to rise to after loading, before moving to meeasure.
-#<_rc_to_measure_z> = ${config.safeZ}
+#<_rc_to_measure_z> = ${config.toMeasureZ}
 (print,Move To Measure Z: #<_rc_to_measure_z>)
 
 ; The Z machine coordinate position for clearing all obstacles.
@@ -420,42 +496,42 @@ function generateFluidNCInit() {
 
 ; Dust Cover
 ; The dust cover operational mode: 0 = Disabled, 1 = Axis, 2 = Output
-#<_rc_cover_mode> = 0
+#<_rc_cover_mode> = ${config.coverMode}
 (print,Dust Cover Mode: #<_rc_cover_mode>)
 
 ; The axis for axis mode: 3 = A Axis, 4 = B Axis, 5 = C Axis
-#<_rc_cover_axis> = 0
+#<_rc_cover_axis> = ${config.coverAxis}
 (print,Dust Cover Axis: #<_rc_cover_axis>)
 
 ; The machine coordinate closed position for axis mode.
-#<_rc_cover_c_pos> = 0
+#<_rc_cover_c_pos> = ${config.coverClosedPos}
 (print,Dust Cover Closed Pos: #<_rc_cover_c_pos>)
 
 ; The machine coordinate open position for axis mode.
-#<_rc_cover_o_pos> = 0
+#<_rc_cover_o_pos> = ${config.coverOpenPos}
 (print,Dust Cover Open Pos: #<_rc_cover_o_pos>)
 
 ; The output number for output mode.
-#<_rc_cover_output> = 0
+#<_rc_cover_output> = ${config.coverOutput}
 (print,Dust Cover Output: #<_rc_cover_output>)
 
 ; The time to dwell in output mode to allow the cover to fully open/close before moving.
-#<_rc_cover_dwell> = 1
+#<_rc_cover_dwell> = ${config.coverDwell}
 (print,Dust Cover Dwell: #<_rc_cover_dwell>)
 
 ; Tool Recognition
 ; Tool recognition mode: 0 = Disabled-User confirmation only, 1 = Enabled
-#<_rc_recognize> = 0
+#<_rc_recognize> = ${config.recognizeEnabled ? 1 : 0}
 (print,Tool Recognition Enabled: #<_rc_recognize>)
 
 ; IR sensor input number.
-#<_rc_rec_input> = 0
+#<_rc_rec_input> = ${config.recInput}
 (print,Tool Recognition Input: #<_rc_rec_input>)
 
 ; Z Machine coordinate positions tool recognition.
-#<_rc_zone_one_z> = -63.500
+#<_rc_zone_one_z> = ${config.zoneOneZ}
 (print,Tool Recognition Zone 1 Z: #<_rc_zone_one_z>)
-#<_rc_zone_two_z> =-57.0
+#<_rc_zone_two_z> = ${config.zoneTwoZ}
 (print,Tool Recognition Zone 2 Z: #<_rc_zone_two_z>)
 
 ; Tool Measurement
@@ -494,7 +570,7 @@ function generateFluidNCInit() {
 (print,Tool Measure Set Feed Rate: #<_rc_set_feed>)
 
 ; The optional reference position for TLO. This may remain at it's default of 0 or be customized.
-#<_rc_tlo_ref> = 0
+#<_rc_tlo_ref> = ${config.tloRef}
 (print,Tool Measure TLO Ref Pos: #<_rc_tlo_ref>)
 `;
     }
@@ -694,19 +770,19 @@ function generateGrblHALInit() {
 (debug, Engage Z: #<_rc_engage_z>)
 
 ; The Z machine coordinate position at which to start the spindle when loading.
-#<_rc_load_spin_z> = ${config.engageZ + 18}
+#<_rc_load_spin_z> = ${config.loadSpinZ}
 (debug, Load Spindle Start Z: #<_rc_load_spin_z>)
 
 ; The number of times to plunge when loading.
-#<_rc_plunge_count> = 3
+#<_rc_plunge_count> = ${config.plungeCount}
 (debug, Load Plunge Count: #<_rc_plunge_count>)
 
 ; The Z machine coordinate position to rise to after unloading, before moving to load.
-#<_rc_to_load_z> = ${config.safeZ}
+#<_rc_to_load_z> = ${config.toLoadZ}
 (debug, Move To Load Z: #<_rc_to_load_z>)
 
 ; The Z machine coordinate position to rise to after loading, before moving to meeasure.
-#<_rc_to_measure_z> = ${config.safeZ + 50}
+#<_rc_to_measure_z> = ${config.toMeasureZ}
 (debug, Move To Measure Z: #<_rc_to_measure_z>)
 
 ; The Z machine coordinate position for clearing all obstacles.
@@ -734,42 +810,42 @@ function generateGrblHALInit() {
 
 ; Dust Cover
 ; The dust cover operational mode: 0 = Disabled, 1 = Axis, 2 = Output
-#<_rc_cover_mode> = 0
+#<_rc_cover_mode> = ${config.coverMode}
 (debug, Dust Cover Mode: #<_rc_cover_mode>)
 
 ; The axis for axis mode: 3 = A Axis, 1 = B Axis, 2 = C Axis
-#<_rc_cover_axis> = 0
+#<_rc_cover_axis> = ${config.coverAxis}
 (debug, Dust Cover Axis: #<_rc_cover_axis>)
 
 ; The machine coordinate closed position for axis mode.
-#<_rc_cover_c_pos> = 0
+#<_rc_cover_c_pos> = ${config.coverClosedPos}
 (debug, Dust Cover Closed Pos: #<_rc_cover_c_pos>)
 
 ; The machine coordinate open position for axis mode.
-#<_rc_cover_o_pos> = 0
+#<_rc_cover_o_pos> = ${config.coverOpenPos}
 (debug, Dust Cover Open Pos: #<_rc_cover_o_pos>)
 
 ; The output number for output mode.
-#<_rc_cover_output> = 0
+#<_rc_cover_output> = ${config.coverOutput}
 (debug, Dust Cover Output: #<_rc_cover_output>)
 
 ; The time to dwell in output mode to allow the cover to fully open/close before moving.
-#<_rc_cover_dwell> = 0
+#<_rc_cover_dwell> = ${config.coverDwell}
 (debug, Dust Cover Dwell: #<_rc_cover_dwell>)
 
 ; Tool Recognition
 ; Tool recognition mode: 0 = Disabled-User confirmation only, 1 = Enabled
-#<_rc_recognize> = 0
+#<_rc_recognize> = ${config.recognizeEnabled ? 1 : 0}
 (debug, Tool Recognition Enabled: #<_rc_recognize>)
 
 ; IR sensor input number.
-#<_rc_rec_input> = 0
+#<_rc_rec_input> = ${config.recInput}
 (debug, Tool Recognition Input: #<_rc_rec_input>)
 
 ; Z Machine coordinate positions tool recognition.
-#<_rc_zone_one_z> = 0
+#<_rc_zone_one_z> = ${config.zoneOneZ}
 (debug, Tool Recognition Zone 1 Z: #<_rc_zone_one_z>)
-#<_rc_zone_two_z> = 0
+#<_rc_zone_two_z> = ${config.zoneTwoZ}
 (debug, Tool Recognition Zone 2 Z: #<_rc_zone_two_z>)
 
 ; Tool Measurement
@@ -808,7 +884,7 @@ function generateGrblHALInit() {
 (debug, Tool Measure Set Feed Rate: #<_rc_set_feed>)
 
 ; The optional reference position for TLO. This may remain at it's default of 0 or be customized.
-#<_rc_tlo_ref> = 0
+#<_rc_tlo_ref> = ${config.tloRef}
 (debug, Tool Measure TLO Ref Pos: #<_rc_tlo_ref>)
 `;
     }

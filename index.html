@@ -61,6 +61,30 @@
                     </div>
                     
                     <div class="input-group">
+                        <label for="load-spin-z">Load Spindle Start Z:</label>
+                        <input type="number" id="load-spin-z" name="load-spin-z" value="-125" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to start spindle when loading">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="plunge-count">Load Plunge Count:</label>
+                        <input type="number" id="plunge-count" name="plunge-count" value="2" min="1" max="10">
+                        <span class="tooltip" data-tooltip="Number of times to plunge when loading">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="to-load-z">Move To Load Z:</label>
+                        <input type="number" id="to-load-z" name="to-load-z" value="-80" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to rise to after unloading, before moving to load">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="to-measure-z">Move To Measure Z:</label>
+                        <input type="number" id="to-measure-z" name="to-measure-z" value="-80" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to rise to after loading, before moving to measure">?</span>
+                    </div>
+                    
+                    <div class="input-group">
                         <label for="safe-z">Safe Z Clearance:</label>
                         <input type="number" id="safe-z" name="safe-z" value="-80" step="0.1">
                         <span class="tooltip" data-tooltip="Z position for clearing all obstacles during moves">?</span>
@@ -92,49 +116,62 @@
 
             <div class="tool-measurement">
                 <h2>Tool Measurement</h2>
-                <div class="settings-grid">
-                    <div class="input-group checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="measure-enabled" name="measure-enabled" checked>
-                            <span class="checkbox-custom"></span>
-                            Enable Tool Measurement
-                        </label>
-                    </div>
-                    
-                    <div id="measurement-settings" class="measurement-settings">
+                <div class="input-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="measure-enabled" name="measure-enabled" checked>
+                        <span class="checkbox-custom"></span>
+                        Enable Tool Measurement
+                    </label>
+                </div>
+                
+                <div id="measurement-settings" class="measurement-settings">
+                    <div class="settings-grid">
                         <div class="input-group">
                             <label for="measure-x">Tool Setter X:</label>
                             <input type="number" id="measure-x" name="measure-x" value="1184.7" step="0.1">
+                            <span class="tooltip" data-tooltip="X machine coordinate of tool setter">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="measure-y">Tool Setter Y:</label>
                             <input type="number" id="measure-y" name="measure-y" value="74.7" step="0.1">
+                            <span class="tooltip" data-tooltip="Y machine coordinate of tool setter">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="measure-start-z">Measurement Start Z:</label>
                             <input type="number" id="measure-start-z" name="measure-start-z" value="-80" step="0.1">
+                            <span class="tooltip" data-tooltip="Z position to begin initial probe">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="seek-distance">Seek Distance:</label>
                             <input type="number" id="seek-distance" name="seek-distance" value="150" step="0.1">
+                            <span class="tooltip" data-tooltip="Distance to probe for tool setter">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="retract-distance">Retract Distance:</label>
                             <input type="number" id="retract-distance" name="retract-distance" value="1" step="0.1">
+                            <span class="tooltip" data-tooltip="Distance to retract after probe trigger">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="seek-feed">Seek Feed Rate:</label>
                             <input type="number" id="seek-feed" name="seek-feed" value="500" step="1">
+                            <span class="tooltip" data-tooltip="Feed rate for initial probe">?</span>
                         </div>
                         
                         <div class="input-group">
                             <label for="set-feed">Set Feed Rate:</label>
                             <input type="number" id="set-feed" name="set-feed" value="25" step="1">
+                            <span class="tooltip" data-tooltip="Feed rate for second probe">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="tlo-ref">TLO Reference Position:</label>
+                            <input type="number" id="tlo-ref" name="tlo-ref" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Optional reference position for TLO">?</span>
                         </div>
                     </div>
                 </div>
@@ -153,6 +190,92 @@
                         <label for="manual-y">Manual Change Y:</label>
                         <input type="number" id="manual-y" name="manual-y" value="50" step="0.1">
                         <span class="tooltip" data-tooltip="Y position for manual tool change operations">?</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dust-cover">
+                <h2>Dust Cover Configuration</h2>
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label for="cover-mode">Dust Cover Mode:</label>
+                        <select id="cover-mode" name="cover-mode">
+                            <option value="0">Disabled</option>
+                            <option value="1">Axis</option>
+                            <option value="2">Output</option>
+                        </select>
+                        <span class="tooltip" data-tooltip="Dust cover operational mode">?</span>
+                    </div>
+
+                    <div id="axis-settings" class="axis-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="cover-axis">Dust Cover Axis:</label>
+                            <select id="cover-axis" name="cover-axis">
+                                <option value="3">A Axis</option>
+                                <option value="4">B Axis</option>
+                                <option value="5">C Axis</option>
+                            </select>
+                            <span class="tooltip" data-tooltip="Axis for axis mode operation">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-closed-pos">Closed Position:</label>
+                            <input type="number" id="cover-closed-pos" name="cover-closed-pos" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Machine coordinate closed position for axis mode">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-open-pos">Open Position:</label>
+                            <input type="number" id="cover-open-pos" name="cover-open-pos" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Machine coordinate open position for axis mode">?</span>
+                        </div>
+                    </div>
+
+                    <div id="output-settings" class="output-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="cover-output">Output Number:</label>
+                            <input type="number" id="cover-output" name="cover-output" value="0" min="0" max="10">
+                            <span class="tooltip" data-tooltip="Output number for output mode">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-dwell">Dwell Time:</label>
+                            <input type="number" id="cover-dwell" name="cover-dwell" value="1" step="0.1">
+                            <span class="tooltip" data-tooltip="Time to dwell to allow cover to fully open/close">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-recognition">
+                <h2>Tool Recognition</h2>
+                <div class="settings-grid">
+                    <div class="input-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="recognize-enabled" name="recognize-enabled">
+                            <span class="checkbox-custom"></span>
+                            Enable Tool Recognition
+                        </label>
+                    </div>
+
+                    <div id="recognition-settings" class="recognition-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="rec-input">IR Sensor Input:</label>
+                            <input type="number" id="rec-input" name="rec-input" value="0" min="0" max="10">
+                            <span class="tooltip" data-tooltip="IR sensor input number">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="zone-one-z">Zone 1 Z Position:</label>
+                            <input type="number" id="zone-one-z" name="zone-one-z" value="-63.5" step="0.1">
+                            <span class="tooltip" data-tooltip="Z coordinate for recognition zone 1">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="zone-two-z">Zone 2 Z Position:</label>
+                            <input type="number" id="zone-two-z" name="zone-two-z" value="-57.0" step="0.1">
+                            <span class="tooltip" data-tooltip="Z coordinate for recognition zone 2">?</span>
+                        </div>
                     </div>
                 </div>
             </div>
