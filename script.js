@@ -2011,19 +2011,31 @@ function displayMacros(macroFiles) {
     const container = document.getElementById('macro-files');
     container.innerHTML = '';
     
-    macroFiles.forEach(file => {
+    macroFiles.forEach((file, index) => {
         const fileDiv = document.createElement('div');
         fileDiv.className = 'macro-file fade-in';
+        
+        // Create unique ID for this file
+        const fileId = `macro-file-${index}`;
         
         fileDiv.innerHTML = `
             <div class="file-header">
                 <span>${file.filename}</span>
-                <button class="btn-download" onclick="downloadFile('${file.filename}', \`${file.content.replace(/`/g, '\\`')}\`)">
+                <button class="btn-download" data-filename="${escapeHtml(file.filename)}" data-file-id="${fileId}">
                     Download
                 </button>
             </div>
             <div class="file-content">${escapeHtml(file.content)}</div>
         `;
+        
+        // Store the file content in a data attribute on the container
+        fileDiv.setAttribute('data-file-content', file.content);
+        
+        // Add event listener to the download button
+        const downloadBtn = fileDiv.querySelector('.btn-download');
+        downloadBtn.addEventListener('click', () => {
+            downloadFile(file.filename, file.content);
+        });
         
         container.appendChild(fileDiv);
     });
