@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATC Macro Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ATC Macro Generator</h1>
+            <p class="subtitle">Generate FluidNC and GrblHAL Automatic Tool Changer Macros</p>
+        </header>
+
+        <main>
+            <div class="firmware-selection">
+                <h2>Select Firmware Type</h2>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="firmware" value="fluidnc" checked>
+                        <span class="radio-custom"></span>
+                        FluidNC
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="firmware" value="grblhal">
+                        <span class="radio-custom"></span>
+                        GrblHAL
+                    </label>
+                </div>
+            </div>
+
+            <div class="magazine-config">
+                <h2>Magazine Configuration</h2>
+                <div class="input-group">
+                    <label for="magazine-count">Number of Magazines:</label>
+                    <select id="magazine-count" name="magazine-count">
+                        <option value="1">1 Magazine</option>
+                        <option value="2" selected>2 Magazines</option>
+                        <option value="3">3 Magazines</option>
+                        <option value="4">4 Magazines</option>
+                        <option value="5">5 Magazines</option>
+                        <option value="6">6 Magazines</option>
+                        <option value="7">7 Magazines</option>
+                        <option value="8">8 Magazines</option>
+                        <option value="9">9 Magazines</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="global-settings">
+                <h2>Global Settings</h2>
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label for="units">Units:</label>
+                        <select id="units" name="units">
+                            <option value="21">Millimeters</option>
+                            <option value="20">Inches</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="engage-z">Engage Z Position:</label>
+                        <input type="number" id="engage-z" name="engage-z" value="-141.5" step="0.1">
+                        <span class="tooltip" data-tooltip="Z machine coordinate position where tool engagement occurs">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="load-spin-z">Load Spindle Start Z:</label>
+                        <input type="number" id="load-spin-z" name="load-spin-z" value="-125" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to start spindle when loading">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="plunge-count">Load Plunge Count:</label>
+                        <input type="number" id="plunge-count" name="plunge-count" value="2" min="1" max="10">
+                        <span class="tooltip" data-tooltip="Number of times to plunge when loading">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="to-load-z">Move To Load Z:</label>
+                        <input type="number" id="to-load-z" name="to-load-z" value="-80" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to rise to after unloading, before moving to load">?</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="to-measure-z">Move To Measure Z:</label>
+                        <input type="number" id="to-measure-z" name="to-measure-z" value="-80" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position to rise to after loading, before moving to measure">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="safe-z">Safe Z Clearance:</label>
+                        <input type="number" id="safe-z" name="safe-z" value="-80" step="0.1">
+                        <span class="tooltip" data-tooltip="Z position for clearing all obstacles during moves">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="engage-feed">Engage Feed Rate:</label>
+                        <input type="number" id="engage-feed" name="engage-feed" value="2000" step="1">
+                        <span class="tooltip" data-tooltip="Feed rate used for tool engagement and disengagement">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="unload-rpm">Unload RPM (CCW):</label>
+                        <input type="number" id="unload-rpm" name="unload-rpm" value="2000" step="1">
+                        <span class="tooltip" data-tooltip="Spindle speed for tool unloading (counter-clockwise)">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="load-rpm">Load RPM (CW):</label>
+                        <input type="number" id="load-rpm" name="load-rpm" value="1600" step="1">
+                        <span class="tooltip" data-tooltip="Spindle speed for tool loading (clockwise)">?</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="magazines-container">
+                <!-- Magazine configurations will be dynamically generated here -->
+            </div>
+
+            <div class="tool-measurement">
+                <h2>Tool Measurement</h2>
+                <div class="input-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="measure-enabled" name="measure-enabled" checked>
+                        <span class="checkbox-custom"></span>
+                        Enable Tool Measurement
+                    </label>
+                </div>
+                
+                <div id="measurement-settings" class="measurement-settings">
+                    <div class="settings-grid">
+                        <div class="input-group">
+                            <label for="measure-x">Tool Setter X:</label>
+                            <input type="number" id="measure-x" name="measure-x" value="1184.7" step="0.1">
+                            <span class="tooltip" data-tooltip="X machine coordinate of tool setter">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="measure-y">Tool Setter Y:</label>
+                            <input type="number" id="measure-y" name="measure-y" value="74.7" step="0.1">
+                            <span class="tooltip" data-tooltip="Y machine coordinate of tool setter">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="measure-start-z">Measurement Start Z:</label>
+                            <input type="number" id="measure-start-z" name="measure-start-z" value="-80" step="0.1">
+                            <span class="tooltip" data-tooltip="Z position to begin initial probe">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="seek-distance">Seek Distance:</label>
+                            <input type="number" id="seek-distance" name="seek-distance" value="150" step="0.1">
+                            <span class="tooltip" data-tooltip="Distance to probe for tool setter">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="retract-distance">Retract Distance:</label>
+                            <input type="number" id="retract-distance" name="retract-distance" value="1" step="0.1">
+                            <span class="tooltip" data-tooltip="Distance to retract after probe trigger">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="seek-feed">Seek Feed Rate:</label>
+                            <input type="number" id="seek-feed" name="seek-feed" value="500" step="1">
+                            <span class="tooltip" data-tooltip="Feed rate for initial probe">?</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="set-feed">Set Feed Rate:</label>
+                            <input type="number" id="set-feed" name="set-feed" value="25" step="1">
+                            <span class="tooltip" data-tooltip="Feed rate for second probe">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="tlo-ref">TLO Reference Position:</label>
+                            <input type="number" id="tlo-ref" name="tlo-ref" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Optional reference position for TLO">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="manual-change">
+                <h2>Manual Tool Change</h2>
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label for="manual-x">Manual Change X:</label>
+                        <input type="number" id="manual-x" name="manual-x" value="100" step="0.1">
+                        <span class="tooltip" data-tooltip="X position for manual tool change operations">?</span>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="manual-y">Manual Change Y:</label>
+                        <input type="number" id="manual-y" name="manual-y" value="50" step="0.1">
+                        <span class="tooltip" data-tooltip="Y position for manual tool change operations">?</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dust-cover">
+                <h2>Dust Cover Configuration</h2>
+                <div class="settings-grid">
+                    <div class="input-group">
+                        <label for="cover-mode">Dust Cover Mode:</label>
+                        <select id="cover-mode" name="cover-mode">
+                            <option value="0">Disabled</option>
+                            <option value="1">Axis</option>
+                            <option value="2">Output</option>
+                        </select>
+                        <span class="tooltip" data-tooltip="Dust cover operational mode">?</span>
+                    </div>
+
+                    <div id="axis-settings" class="axis-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="cover-axis">Dust Cover Axis:</label>
+                            <select id="cover-axis" name="cover-axis">
+                                <option value="3">A Axis</option>
+                                <option value="4">B Axis</option>
+                                <option value="5">C Axis</option>
+                            </select>
+                            <span class="tooltip" data-tooltip="Axis for axis mode operation">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-closed-pos">Closed Position:</label>
+                            <input type="number" id="cover-closed-pos" name="cover-closed-pos" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Machine coordinate closed position for axis mode">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-open-pos">Open Position:</label>
+                            <input type="number" id="cover-open-pos" name="cover-open-pos" value="0" step="0.1">
+                            <span class="tooltip" data-tooltip="Machine coordinate open position for axis mode">?</span>
+                        </div>
+                    </div>
+
+                    <div id="output-settings" class="output-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="cover-output">Output Number:</label>
+                            <input type="number" id="cover-output" name="cover-output" value="0" min="0" max="10">
+                            <span class="tooltip" data-tooltip="Output number for output mode">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="cover-dwell">Dwell Time:</label>
+                            <input type="number" id="cover-dwell" name="cover-dwell" value="1" step="0.1">
+                            <span class="tooltip" data-tooltip="Time to dwell to allow cover to fully open/close">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-recognition">
+                <h2>Tool Recognition</h2>
+                <div class="settings-grid">
+                    <div class="input-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="recognize-enabled" name="recognize-enabled">
+                            <span class="checkbox-custom"></span>
+                            Enable Tool Recognition
+                        </label>
+                    </div>
+
+                    <div id="recognition-settings" class="recognition-settings" style="display: none;">
+                        <div class="input-group">
+                            <label for="rec-input">IR Sensor Input:</label>
+                            <input type="number" id="rec-input" name="rec-input" value="0" min="0" max="10">
+                            <span class="tooltip" data-tooltip="IR sensor input number">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="zone-one-z">Zone 1 Z Position:</label>
+                            <input type="number" id="zone-one-z" name="zone-one-z" value="-63.5" step="0.1">
+                            <span class="tooltip" data-tooltip="Z coordinate for recognition zone 1">?</span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="zone-two-z">Zone 2 Z Position:</label>
+                            <input type="number" id="zone-two-z" name="zone-two-z" value="-57.0" step="0.1">
+                            <span class="tooltip" data-tooltip="Z coordinate for recognition zone 2">?</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="generate-btn" class="btn-primary">Generate Macros</button>
+                <button id="preview-btn" class="btn-secondary">Preview Configuration</button>
+            </div>
+
+            <div id="output-section" class="output-section" style="display: none;">
+                <h2>Generated Macros</h2>
+                <div class="output-container">
+                    <div id="macro-files"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="tooltip" class="tooltip-popup"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
