@@ -133,19 +133,30 @@ function setupGlobalSettingsListeners() {
 function updateFirmwareSpecificSettings() {
     // Update default values based on firmware
     if (config.firmware === 'grblhal') {
-        // GrblHAL defaults
+        // GrblHAL now supports up to 9 magazines
         document.getElementById('magazine-count').innerHTML = `
             <option value="1">1 Magazine</option>
             <option value="2" selected>2 Magazines</option>
+            <option value="3">3 Magazines</option>
+            <option value="4">4 Magazines</option>
+            <option value="5">5 Magazines</option>
+            <option value="6">6 Magazines</option>
+            <option value="7">7 Magazines</option>
+            <option value="8">8 Magazines</option>
+            <option value="9">9 Magazines</option>
         `;
-        config.magazineCount = Math.min(config.magazineCount, 2);
     } else {
-        // FluidNC defaults (supports up to 4 magazines)
+        // FluidNC supports up to 9 magazines
         document.getElementById('magazine-count').innerHTML = `
             <option value="1">1 Magazine</option>
             <option value="2">2 Magazines</option>
             <option value="3">3 Magazines</option>
             <option value="4">4 Magazines</option>
+            <option value="5">5 Magazines</option>
+            <option value="6">6 Magazines</option>
+            <option value="7">7 Magazines</option>
+            <option value="8">8 Magazines</option>
+            <option value="9">9 Magazines</option>
         `;
     }
     updateMagazineConfiguration();
@@ -608,8 +619,6 @@ G43.1 Z0`;
 }
 
 function generateFluidNCToolChange() {
-    // This would be the complete FluidNC tool change macro
-    // For brevity, I'm including a simplified version that handles the magazine count
     return `; ************ BEGIN VALIDATION ************
 o50 if [#1001 NE 1]
 	(print, RapidChange settings are not initialized.)
@@ -645,8 +654,8 @@ o50 else
 	; Magazine determination logic for ${config.magazineCount} magazines
 	${generateMagazineDeterminationLogic()}
 
-	; Tool change operations continue...
-	; [Complete tool change logic would be here]
+	; [Complete tool change operations for unloading and loading would continue here]
+	; This is a simplified version showing magazine determination for up to 9 magazines
 
 o50 endif`;
 }
@@ -655,6 +664,8 @@ function generateMagazineDeterminationLogic() {
     let logic = '';
     let totalPockets = 0;
     
+    logic += `	; Determine current magazine based on current tool number\n`;
+    
     for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
@@ -662,8 +673,7 @@ function generateMagazineDeterminationLogic() {
         totalPockets += mag.pockets;
         
         if (i === 0) {
-            logic += `	; Determine current magazine based on current tool number
-	o205 if [#<_current_tool> LE #<_rc${magNum}_pockets>]
+            logic += `	o205 if [#<_current_tool> LE #<_rc${magNum}_pockets>]
   		#<_current_magazine> = ${magNum}
   		(print, Current tool in magazine #<_current_magazine>)
 `;
@@ -681,6 +691,98 @@ function generateMagazineDeterminationLogic() {
         }
     }
     
+    // Generate selected magazine determination logic
+    logic += '\n	; Determine selected magazine based on selected tool number\n';
+    totalPockets = 0;
+    
+    for (let i = 0; i < config.magazineCount; i++) {
+        const mag = config.magazines[i];
+        const magNum = i + 1;
+        const previousTotal = totalPockets;
+        totalPockets += mag.pockets;
+        
+        if (i === 0) {
+            logic += `	o206 if [#<_selected_tool> LE #<_rc${magNum}_pockets>]
+  		#<_selected_magazine> = ${magNum}
+  		(print, Selected tool in magazine #<_selected_magazine>)
+`;
+        } else if (i === config.magazineCount - 1) {
+            logic += `	o206 else 
+		#<_selected_magazine> = ${magNum}
+		(print, Selected tool in magazine #<_selected_magazine>)
+	o206 endif
+`;
+        } else {
+            logic += `	o206 elseif [#<_selected_tool> GT ${previousTotal} AND #<_selected_tool> LE ${totalPockets}]
+  		#<_selected_magazine> = ${magNum}
+  		(print, Selected tool in magazine #<_selected_magazine>)
+`;
+        }
+    }
+    
+    return logic;
+}
+
+function generateGrblHALMagazineDeterminationLogic() {
+    let logic = '';
+    let totalPockets = 0;
+    
+    logic += `	; Determine current magazine based on current tool number\n`;
+    
+    for (let i = 0; i < config.magazineCount; i++) {
+        const mag = config.magazines[i];
+        const magNum = i + 1;
+        const previousTotal = totalPockets;
+        totalPockets += mag.pockets;
+        
+        if (i === 0) {
+            logic += `	o205 if [#<_current_tool> LE #<_rc${magNum}_pockets>]
+  		#<_current_magazine> = ${magNum}
+  		(debug, Current tool in magazine #<_current_magazine>)
+`;
+        } else if (i === config.magazineCount - 1) {
+            logic += `	o205 else 
+		#<_current_magazine> = ${magNum}
+		(debug, Current tool in magazine #<_current_magazine>)
+	o205 endif
+`;
+        } else {
+            logic += `	o205 elseif [#<_current_tool> GT ${previousTotal} AND #<_current_tool> LE ${totalPockets}]
+  		#<_current_magazine> = ${magNum}
+  		(debug, Current tool in magazine #<_current_magazine>)
+`;
+        }
+    }
+    
+    // Generate selected magazine determination logic
+    logic += '\n	; Determine selected magazine based on selected tool number\n';
+    totalPockets = 0;
+    
+    for (let i = 0; i < config.magazineCount; i++) {
+        const mag = config.magazines[i];
+        const magNum = i + 1;
+        const previousTotal = totalPockets;
+        totalPockets += mag.pockets;
+        
+        if (i === 0) {
+            logic += `	o206 if [#<_selected_tool> LE #<_rc${magNum}_pockets>]
+  		#<_selected_magazine> = ${magNum}
+  		(debug, Selected tool in magazine #<_selected_magazine>)
+`;
+        } else if (i === config.magazineCount - 1) {
+            logic += `	o206 else 
+		#<_selected_magazine> = ${magNum}
+		(debug, Selected tool in magazine #<_selected_magazine>)
+	o206 endif
+`;
+        } else {
+            logic += `	o206 elseif [#<_selected_tool> GT ${previousTotal} AND #<_selected_tool> LE ${totalPockets}]
+  		#<_selected_magazine> = ${magNum}
+  		(debug, Selected tool in magazine #<_selected_magazine>)
+`;
+        }
+    }
+    
     return logic;
 }
 
@@ -693,50 +795,83 @@ function generateGrblHALInit() {
 
 `;
 
-    // For GrblHAL, limit to 2 magazines
-    const maxMags = Math.min(config.magazineCount, 2);
-    
-    for (let i = 0; i < maxMags; i++) {
+    // Magazine pocket configuration for up to 9 magazines
+    for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
         
-        content += `; The number of pockets in your ${i === 0 ? 'magazine' : 'secondary module'}.
+        if (i === 0) {
+            content += `; The number of pockets in your magazine.
 #<_rc${magNum}_pockets> = ${mag.pockets}
-(debug, ${i === 0 ? 'Pockets' : 'Secondary Pockets'}: #<_rc${magNum}_pockets>)
+(debug, Pockets: #<_rc${magNum}_pockets>)
 `;
-        
-        if (i === 0) content += '\n';
+        } else if (i === 1) {
+            content += `; The number of pockets in the secondary module.
+#<_rc${magNum}_pockets> = ${mag.pockets}
+(debug, Secondary Pockets: #<_rc${magNum}_pockets>)
+`;
+        } else {
+            content += `; The number of pockets in the ${getOrdinal(magNum)} magazine.
+#<_rc${magNum}_pockets> = ${mag.pockets}
+(debug, Magazine ${magNum} Pockets: #<_rc${magNum}_pockets>)
+`;
+        }
     }
 
-    for (let i = 0; i < maxMags; i++) {
+    content += '\n';
+
+    // Pocket offset configuration for each magazine
+    for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
         
-        content += `; The pocket offset for your ${i === 0 ? 'magazine' : 'second magazine'}.
+        if (i === 0) {
+            content += `; The pocket offset for your magazine.
 #<_rc${magNum}_pocket_offset> = ${mag.pocketOffset}
 (debug, Pocket Offset: #<_rc${magNum}_pocket_offset>)
 `;
-        
-        if (i === 0 && maxMags > 1) content += '\n';
+        } else if (i === 1) {
+            content += `; The pocket offset for your second magazine.
+#<_rc${magNum}_pocket_offset> = ${mag.pocketOffset}
+(debug, Pocket Offset: #<_rc${magNum}_pocket_offset>)
+`;
+        } else {
+            content += `; The pocket offset for your ${getOrdinal(magNum)} magazine.
+#<_rc${magNum}_pocket_offset> = ${mag.pocketOffset}
+(debug, Magazine ${magNum} Pocket Offset: #<_rc${magNum}_pocket_offset>)
+`;
+        }
     }
 
     content += '\n';
 
-    for (let i = 0; i < maxMags; i++) {
+    // Alignment configuration for each magazine
+    for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
         
-        content += `; The axis along which the ${i === 0 ? 'first' : 'second'} magazine is aligned: 0 = X Axis, 1 = Y Axis.
+        if (i === 0) {
+            content += `; The axis along which the first magazine is aligned: 0 = X Axis, 1 = Y Axis.
 #<_rc${magNum}_alignment> = ${mag.alignment}
 (debug, Alignment: #<_rc${magNum}_alignment>)
 `;
-        
-        if (i === 0 && maxMags > 1) content += '\n';
+        } else if (i === 1) {
+            content += `; The axis along which the second magazine is aligned: 0 = X Axis, 1 = Y Axis.
+#<_rc${magNum}_alignment> = ${mag.alignment}
+(debug, Alignment: #<_rc${magNum}_alignment>)
+`;
+        } else {
+            content += `; The axis along which the ${getOrdinal(magNum)} magazine is aligned: 0 = X Axis, 1 = Y Axis.
+#<_rc${magNum}_alignment> = ${mag.alignment}
+(debug, Magazine ${magNum} Alignment: #<_rc${magNum}_alignment>)
+`;
+        }
     }
 
     content += '\n';
 
-    for (let i = 0; i < maxMags; i++) {
+    // Direction configuration for each magazine
+    for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
         
@@ -744,24 +879,39 @@ function generateGrblHALInit() {
 #<_rc${magNum}_direction> = ${mag.direction}
 (debug, Direction: #<_rc${magNum}_direction>)
 `;
-        
-        if (i === 0 && maxMags > 1) content += '\n';
     }
 
     content += '\n';
 
-    for (let i = 0; i < maxMags; i++) {
+    // Position configuration for each magazine
+    for (let i = 0; i < config.magazineCount; i++) {
         const mag = config.magazines[i];
         const magNum = i + 1;
         
-        content += `; The X and Y machine coordinate positions of ${i === 0 ? 'primary' : 'secondary'} magazine pocket 1.
+        if (i === 0) {
+            content += `; The X and Y machine coordinate positions of primary magazine pocket 1.
 #<_rc${magNum}_pocket_one_x> = ${mag.pocketOneX}
-(debug, Pocket ${i + 1} X: #<_rc${magNum}_pocket_one_x>)
+(debug, Pocket ${magNum} X: #<_rc${magNum}_pocket_one_x>)
 #<_rc${magNum}_pocket_one_y> = ${mag.pocketOneY}
-(debug, Pocket ${i + 1} Y: #<_rc${magNum}_pocket_one_y>)
+(debug, Pocket ${magNum} Y: #<_rc${magNum}_pocket_one_y>)
 `;
+        } else if (i === 1) {
+            content += `; The X and Y machine coordinate positions of secondary magazine pocket 1.
+#<_rc${magNum}_pocket_one_x> = ${mag.pocketOneX}
+(debug, Pocket ${magNum} X: #<_rc${magNum}_pocket_one_x>)
+#<_rc${magNum}_pocket_one_y> = ${mag.pocketOneY}
+(debug, Pocket ${magNum} Y: #<_rc${magNum}_pocket_one_y>)
+`;
+        } else {
+            content += `; The X and Y machine coordinate positions of ${getOrdinal(magNum)} magazine pocket 1.
+#<_rc${magNum}_pocket_one_x> = ${mag.pocketOneX}
+(debug, Magazine ${magNum} Pocket 1 X: #<_rc${magNum}_pocket_one_x>)
+#<_rc${magNum}_pocket_one_y> = ${mag.pocketOneY}
+(debug, Magazine ${magNum} Pocket 1 Y: #<_rc${magNum}_pocket_one_y>)
+`;
+        }
         
-        if (i === 0 && maxMags > 1) content += '\n';
+        if (i < config.magazineCount - 1) content += '\n';
     }
 
     content += `
@@ -918,8 +1068,6 @@ o100 endif
 }
 
 function generateGrblHALToolChange() {
-    // Return the complete GrblHAL tool change macro
-    // This is a simplified version - in practice, you'd want the full logic
     return `; ************ BEGIN VALIDATION ************
 o50 if [#1001 NE 1]
   (debug, RapidChange settings are not initialized.)
@@ -946,8 +1094,25 @@ M5
 M9
 (debug, Spindle and coolant turned off)
 
-; [Complete tool change logic for ${config.magazineCount} magazines would be here]
-; *************** END SETUP ****************`;
+; Record current units
+o200 if [#<_metric> EQ 0]
+  #<_rc_return_units> = 20
+o200 else
+  #<_rc_return_units> = 21
+o200 endif
+(debug, Units recorded)
+
+; Activate configured units and absolute distance mode
+G[#<_rc_units>] G90
+(debug, Set units and distance)
+
+; Magazine determination logic for ${config.magazineCount} magazines
+${generateGrblHALMagazineDeterminationLogic()}
+
+; [Complete tool change operations for unloading and loading would continue here]
+; This is a simplified version showing magazine determination for up to 9 magazines
+
+; ************* END SETUP ****************`;
 }
 
 function generateGrblHALDustCoverOpen() {
@@ -1143,8 +1308,15 @@ function setupTooltips() {
 }
 
 function getOrdinal(num) {
-    const ordinals = ['', '1st', '2nd', '3rd', '4th'];
-    return ordinals[num] || `${num}th`;
+    if (num % 100 >= 11 && num % 100 <= 13) {
+        return `${num}th`;
+    }
+    switch (num % 10) {
+        case 1: return `${num}st`;
+        case 2: return `${num}nd`;
+        case 3: return `${num}rd`;
+        default: return `${num}th`;
+    }
 }
 
 function escapeHtml(text) {
