@@ -1,22 +1,3 @@
-; 
-; Copyright (C) 2024 Greilick Industries LLC
-
-; RapidChange ATC Macros for GrblHAL is free software:
-; You can redistribute it and/or modify it under the terms
-; of the GNU General Public License as published by
-; the Free Software Foundation, under version 3 of the License.
-
-; RapidChange ATC Macros for GrblHAL is distributed in the
-; hope that it will be useful, but WITHOUT ANY WARRANTY
-; without even the implied warranty of MERCHANTABILITY or
-; FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-; License for more details.
-
-; You should have received a copy of the GNU General Public License
-; along with RapidChange ATC Macros for GrblHAL.  
-; If not, see <https://www.gnu.org/licenses/>.
-; 
-
 ; ******** BEGIN USER CONFIGURATION ********
 ; ATC Operations
 ; The units for your configuration: 20 = Inches, 21 = Millimeters
